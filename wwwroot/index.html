@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spielbericht Upload - PongPush</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏓 PongPush</h1>
+            <p class="subtitle">Spielberichte einfach hochladen</p>
+        </header>
+
+        <main>
+            <div class="upload-card">
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="photoInput" class="file-label">
+                            <div class="label-content">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                                <span class="label-text">Spielbericht hochladen</span>
+                                <span class="label-hint">Tippen Sie hier oder wählen Sie ein Foto aus</span>
+                            </div>
+                        </label>
+                        <input
+                            type="file"
+                            id="photoInput"
+                            name="file"
+                            accept="image/*"
+                            capture="environment"
+                            required
+                        >
+                    </div>
+
+                    <div id="preview" class="preview hidden">
+                        <img id="previewImage" src="" alt="Vorschau">
+                        <button type="button" id="removeBtn" class="btn-remove">✕ Entfernen</button>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit" disabled>
+                        <span class="btn-text">Hochladen</span>
+                        <span class="btn-loading hidden">
+                            <span class="spinner"></span> Wird hochgeladen...
+                        </span>
+                    </button>
+                </form>
+
+                <div id="message" class="message hidden"></div>
+            </div>
+
+            <div class="info-card">
+                <h2>ℹ️ Hinweise</h2>
+                <ul>
+                    <li>Unterstützte Formate: JPG, PNG, GIF, WEBP</li>
+                    <li>Maximale Dateigröße: 10 MB</li>
+                    <li>Hochgeladene Bilder werden im GitHub Repository gespeichert</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 PongPush - Entwickelt mit ASP.NET Core</p>
+        </footer>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
