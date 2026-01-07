@@ -36,25 +36,27 @@ jobs:
             # Get commit message for PR title
             COMMIT_MSG=$(git log -1 --pretty=%s)
 
-            # Get commit body for PR description
-            COMMIT_BODY=$(git log -1 --pretty=%b)
+            # Create PR body file
+            cat > /tmp/pr-body.md << 'EOFBODY'
+          ## Automated PR
+
+          This PR was automatically created from a claude/** branch.
+
+          ### Changes
+          EOFBODY
+
+            # Add commit log to PR body
+            git log main..HEAD --oneline >> /tmp/pr-body.md
+
+            echo "" >> /tmp/pr-body.md
+            echo "---" >> /tmp/pr-body.md
+            echo "**Auto-merge**: This PR will automatically merge when all checks pass." >> /tmp/pr-body.md
 
             # Create PR
             echo "Creating PR for $BRANCH_NAME..."
             PR_URL=$(gh pr create \
               --title "$COMMIT_MSG" \
-              --body "## Automated PR from \`$BRANCH_NAME\`
-
-$COMMIT_BODY
-
----
-
-### Changes in this branch
-\`\`\`
-$(git log main..HEAD --oneline)
-\`\`\`
-
-**Auto-merge**: This PR will automatically merge when all checks pass." \
+              --body-file /tmp/pr-body.md \
               --base main \
               --head "$BRANCH_NAME")
 
