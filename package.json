@@ -1,0 +1,20 @@
+{
+  "name": "pongpush",
+  "version": "1.0.0",
+  "description": "Mobile-optimized photo upload app with GitHub integration",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.0.2"
+  }
+}
