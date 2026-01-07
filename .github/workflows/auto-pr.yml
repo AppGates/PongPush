@@ -1,0 +1,69 @@
+name: Auto Create PR
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Extract branch name
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Branch: $BRANCH_NAME"
+
+          # Check if PR already exists
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR #$EXISTING_PR already exists for branch $BRANCH_NAME"
+            PR_NUMBER=$EXISTING_PR
+          else
+            # Get commit message for PR title
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+
+            # Get commit body for PR description
+            COMMIT_BODY=$(git log -1 --pretty=%b)
+
+            # Create PR
+            echo "Creating PR for $BRANCH_NAME..."
+            PR_URL=$(gh pr create \
+              --title "$COMMIT_MSG" \
+              --body "## Automated PR from \`$BRANCH_NAME\`
+
+$COMMIT_BODY
+
+---
+
+### Changes in this branch
+\`\`\`
+$(git log main..HEAD --oneline)
+\`\`\`
+
+**Auto-merge**: This PR will automatically merge when all checks pass." \
+              --base main \
+              --head "$BRANCH_NAME")
+
+            echo "PR created: $PR_URL"
+            PR_NUMBER=$(gh pr view "$BRANCH_NAME" --json number --jq '.number')
+          fi
+
+          # Enable auto-merge
+          echo "Enabling auto-merge for PR #$PR_NUMBER..."
+          gh pr merge "$PR_NUMBER" --auto --merge || echo "Auto-merge already enabled or not available"
+
+          echo "✅ Done! PR will auto-merge when checks pass."
