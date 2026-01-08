@@ -1,0 +1,71 @@
+name: Auto Create PR
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Extract branch name
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Branch: $BRANCH_NAME"
+
+          # Check if PR already exists
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR #$EXISTING_PR already exists for branch $BRANCH_NAME"
+            PR_NUMBER=$EXISTING_PR
+          else
+            # Get commit message for PR title
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+
+            # Create PR body file
+            cat > /tmp/pr-body.md << 'EOFBODY'
+          ## Automated PR
+
+          This PR was automatically created from a claude/** branch.
+
+          ### Changes
+          EOFBODY
+
+            # Add commit log to PR body
+            git log main..HEAD --oneline >> /tmp/pr-body.md
+
+            echo "" >> /tmp/pr-body.md
+            echo "---" >> /tmp/pr-body.md
+            echo "**Auto-merge**: This PR will automatically merge when all checks pass." >> /tmp/pr-body.md
+
+            # Create PR
+            echo "Creating PR for $BRANCH_NAME..."
+            PR_URL=$(gh pr create \
+              --title "$COMMIT_MSG" \
+              --body-file /tmp/pr-body.md \
+              --base main \
+              --head "$BRANCH_NAME")
+
+            echo "PR created: $PR_URL"
+            PR_NUMBER=$(gh pr view "$BRANCH_NAME" --json number --jq '.number')
+          fi
+
+          # Enable auto-merge
+          echo "Enabling auto-merge for PR #$PR_NUMBER..."
+          gh pr merge "$PR_NUMBER" --auto --merge || echo "Auto-merge already enabled or not available"
+
+          echo "✅ Done! PR will auto-merge when checks pass."
