@@ -1,6 +1,6 @@
 === Auto PR Workflow Started ===
-Timestamp: Thu Jan  8 21:36:07 UTC 2026
-Commit: 4a4c1019120d54454565b302e223afe7f2ac20ab
+Timestamp: Thu Jan  8 21:39:40 UTC 2026
+Commit: cd66bebbbca9892b83d190184dd067499009fb7e
 
 === Branch Information ===
 Branch: claude/add-comprehensive-logging-pNyoR
@@ -12,4 +12,4 @@ Ref: refs/heads/claude/add-comprehensive-logging-pNyoR
 === Checking for Existing PR ===
 
 No existing PR found. Creating new PR...
-Commit message: Feature: Add comprehensive logging to auto-PR workflow
+Commit message: Fix: Improve error handling in auto-PR workflow
