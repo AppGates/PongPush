@@ -114,8 +114,9 @@ test.describe('Photo Upload E2E', () => {
     const viewport = await page.locator('meta[name="viewport"]');
     await expect(viewport).toHaveCount(1);
 
-    // Check key UI elements are visible
+    // Check key UI elements are visible/attached
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('input[type="file"]')).toBeVisible();
+    // File input is hidden by CSS (custom styling), check if attached instead
+    await expect(page.locator('input[type="file"]')).toBeAttached();
   });
 });
