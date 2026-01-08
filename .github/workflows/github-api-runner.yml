@@ -1,0 +1,72 @@
+name: GitHub API Script Runner
+
+on:
+  push:
+    paths:
+      - '.github/scripts/github-api-*.sh'
+    branches:
+      - 'claude/**'
+  workflow_dispatch:
+
+jobs:
+  execute-github-api-script:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      actions: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find and execute GitHub API scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Looking for GitHub API scripts..."
+
+          # Find all github-api-*.sh scripts
+          SCRIPTS=$(find .github/scripts -name "github-api-*.sh" -type f 2>/dev/null || true)
+
+          if [ -z "$SCRIPTS" ]; then
+            echo "⚠️ No GitHub API scripts found"
+            exit 0
+          fi
+
+          echo "📜 Found scripts:"
+          echo "$SCRIPTS"
+          echo ""
+
+          # Execute each script
+          for script in $SCRIPTS; do
+            echo "════════════════════════════════════════"
+            echo "🚀 Executing: $script"
+            echo "════════════════════════════════════════"
+
+            chmod +x "$script"
+
+            if bash "$script"; then
+              echo "✅ Script completed successfully"
+            else
+              EXIT_CODE=$?
+              echo "❌ Script failed with exit code $EXIT_CODE"
+              exit $EXIT_CODE
+            fi
+
+            echo ""
+          done
+
+          echo "✅ All scripts executed successfully"
+
+      - name: Upload script results
+        if: always()
+        run: |
+          echo "### GitHub API Script Execution" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the job logs above for detailed output." >> $GITHUB_STEP_SUMMARY
