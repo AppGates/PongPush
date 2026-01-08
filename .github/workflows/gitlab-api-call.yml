@@ -1,0 +1,84 @@
+name: GitLab API Call
+
+on:
+  workflow_dispatch:
+    inputs:
+      gitlab_url:
+        description: 'GitLab API endpoint (e.g., /api/v4/projects)'
+        required: true
+        type: string
+      method:
+        description: 'HTTP method (GET, POST, PUT, DELETE, PATCH)'
+        required: true
+        type: string
+        default: 'GET'
+      body:
+        description: 'Request body (JSON string, leave empty for GET)'
+        required: false
+        type: string
+      gitlab_instance:
+        description: 'GitLab instance URL (default: gitlab.com)'
+        required: false
+        type: string
+        default: 'https://gitlab.com'
+
+jobs:
+  execute-gitlab-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute GitLab API Call
+        id: api_call
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GITLAB_URL: ${{ inputs.gitlab_url }}
+          METHOD: ${{ inputs.method }}
+          BODY: ${{ inputs.body }}
+          GITLAB_INSTANCE: ${{ inputs.gitlab_instance }}
+        run: |
+          # Construct the full API URL
+          FULL_URL="${GITLAB_INSTANCE}${GITLAB_URL}"
+
+          echo "🚀 Executing GitLab API Call"
+          echo "URL: $FULL_URL"
+          echo "Method: $METHOD"
+
+          # Build curl command
+          CURL_CMD="curl -s -w '\n\nHTTP_STATUS:%{http_code}' -X $METHOD"
+          CURL_CMD="$CURL_CMD -H 'PRIVATE-TOKEN: $GITLAB_TOKEN'"
+          CURL_CMD="$CURL_CMD -H 'Content-Type: application/json'"
+
+          # Add body if provided and not a GET request
+          if [ -n "$BODY" ] && [ "$METHOD" != "GET" ]; then
+            CURL_CMD="$CURL_CMD -d '$BODY'"
+          fi
+
+          CURL_CMD="$CURL_CMD '$FULL_URL'"
+
+          # Execute the API call
+          RESPONSE=$(eval $CURL_CMD)
+
+          # Extract HTTP status
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d':' -f2)
+          BODY_RESPONSE=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')
+
+          echo "📊 Response Status: $HTTP_STATUS"
+          echo "📦 Response Body:"
+          echo "$BODY_RESPONSE" | jq . || echo "$BODY_RESPONSE"
+
+          # Check if request was successful
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ API call successful"
+            exit 0
+          else
+            echo "❌ API call failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### GitLab API Call Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Endpoint:** ${{ inputs.gitlab_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Method:** ${{ inputs.method }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Instance:** ${{ inputs.gitlab_instance }}" >> $GITHUB_STEP_SUMMARY
