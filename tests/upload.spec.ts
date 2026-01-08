@@ -16,12 +16,13 @@ async function waitForCorrectCommit(page: Page, expectedSha: string, maxRetries 
     try {
       await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
 
-      const appRoot = page.locator('#app-root');
-      const deployedCommit = await appRoot.getAttribute('data-commit-sha');
+      // Check if element with commit SHA as ID exists
+      const commitElement = page.locator(`#${expectedSha}`);
+      const exists = await commitElement.count() > 0;
 
-      console.log(`Attempt ${i + 1}/${maxRetries}: Deployed commit is ${deployedCommit}`);
+      console.log(`Attempt ${i + 1}/${maxRetries}: Checking for element #${expectedSha} - ${exists ? 'Found' : 'Not found'}`);
 
-      if (deployedCommit === expectedSha) {
+      if (exists) {
         console.log(`✅ Correct commit ${expectedSha} is deployed!`);
         return;
       }
@@ -45,17 +46,12 @@ async function waitForCorrectCommit(page: Page, expectedSha: string, maxRetries 
  * Verify the deployed commit matches what we expect
  */
 async function verifyCommitSha(page: Page): Promise<void> {
-  const appRoot = page.locator('#app-root');
-  await expect(appRoot).toBeAttached();
-
-  const deployedCommit = await appRoot.getAttribute('data-commit-sha');
-  console.log(`📍 Deployed commit: ${deployedCommit}`);
-
   if (EXPECTED_COMMIT_SHA) {
-    expect(deployedCommit).toBe(EXPECTED_COMMIT_SHA);
-    console.log(`✅ Commit SHA verified: ${deployedCommit}`);
+    const commitElement = page.locator(`#${EXPECTED_COMMIT_SHA}`);
+    await expect(commitElement).toBeAttached();
+    console.log(`✅ Commit SHA verified: ${EXPECTED_COMMIT_SHA}`);
   } else {
-    console.log(`ℹ️  No expected commit SHA provided, current: ${deployedCommit}`);
+    console.log(`ℹ️  No expected commit SHA provided, skipping verification`);
   }
 }
 
