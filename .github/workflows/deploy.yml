@@ -103,7 +103,7 @@ jobs:
             # Download page and check for commit ID
             curl -s "$SITE_URL" > /tmp/index.html
 
-            if grep -q "id=\"$EXPECTED_COMMIT\"" /tmp/index.html; then
+            if grep -q "id=\"commit-$EXPECTED_COMMIT\"" /tmp/index.html; then
               echo "✅ Correct commit $EXPECTED_COMMIT is deployed!"
               exit 0
             else

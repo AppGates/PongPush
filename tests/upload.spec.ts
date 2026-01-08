@@ -17,10 +17,10 @@ async function waitForCorrectCommit(page: Page, expectedSha: string, maxRetries 
       await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
 
       // Check if element with commit SHA as ID exists
-      const commitElement = page.locator(`#${expectedSha}`);
+      const commitElement = page.locator(`#commit-${expectedSha}`);
       const exists = await commitElement.count() > 0;
 
-      console.log(`Attempt ${i + 1}/${maxRetries}: Checking for element #${expectedSha} - ${exists ? 'Found' : 'Not found'}`);
+      console.log(`Attempt ${i + 1}/${maxRetries}: Checking for element #commit-${expectedSha} - ${exists ? 'Found' : 'Not found'}`);
 
       if (exists) {
         console.log(`✅ Correct commit ${expectedSha} is deployed!`);
@@ -47,7 +47,7 @@ async function waitForCorrectCommit(page: Page, expectedSha: string, maxRetries 
  */
 async function verifyCommitSha(page: Page): Promise<void> {
   if (EXPECTED_COMMIT_SHA) {
-    const commitElement = page.locator(`#${EXPECTED_COMMIT_SHA}`);
+    const commitElement = page.locator(`#commit-${EXPECTED_COMMIT_SHA}`);
     await expect(commitElement).toBeAttached();
     console.log(`✅ Commit SHA verified: ${EXPECTED_COMMIT_SHA}`);
   } else {
