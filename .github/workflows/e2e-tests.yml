@@ -43,6 +43,7 @@ jobs:
       - name: Run Playwright tests
         env:
           CI: true
+          EXPECTED_COMMIT_SHA: ${{ github.sha }}
         run: npm run test
 
       - name: Upload test results
