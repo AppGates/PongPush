@@ -34,14 +34,10 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Build application
-        env:
-          VITE_GITHUB_TOKEN: ${{ secrets.PongPushPipelineToken }}
         run: |
-          # Inject token into build for testing
-          mkdir -p public
-          cat > public/config.js << EOF
-          window.__GITHUB_TOKEN__ = '${{ secrets.PongPushPipelineToken }}';
-          EOF
+          # Build without token for local testing
+          # Upload test will be skipped if token is not configured
+          # Token is only injected in deploy.yml for the production website
           npm run build
 
       - name: Run Playwright tests
