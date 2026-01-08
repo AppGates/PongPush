@@ -35,12 +35,12 @@ jobs:
 
       - name: Build application
         env:
-          VITE_GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          VITE_GITHUB_TOKEN: ${{ secrets.PongPushPipelineToken }}
         run: |
           # Inject token into build for testing
           mkdir -p public
           cat > public/config.js << EOF
-          window.__GITHUB_TOKEN__ = '${{ secrets.GH_TOKEN }}';
+          window.__GITHUB_TOKEN__ = '${{ secrets.PongPushPipelineToken }}';
           EOF
           npm run build
 
