@@ -13,8 +13,8 @@ on:
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: write  # Need write to push test logs on feature branches
-  pages: write
-  id-token: write
+  pages: write     # Required for GitHub Pages deployment
+  id-token: write  # Required for GitHub Pages deployment
 
 # Allow only one concurrent deployment
 concurrency:
