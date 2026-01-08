@@ -1,0 +1,14 @@
+=== E2E Test Run ===
+Date: Thu Jan  8 21:29:18 UTC 2026
+Commit: 1e07f8ae4fa63826dee92a294b6763953c53b601
+Ref: refs/heads/claude/add-comprehensive-logging-pNyoR
+Job: e2e-local
+
+=== Files ===
+total 44K
+drwxr-xr-x  4 runner runner 4.0K Jan  8 21:29 .
+drwxr-xr-x 14 runner runner 4.0K Jan  8 21:29 ..
+-rw-r--r--  1 runner runner  24K Jan  8 21:29 job-output.log
+drwxr-xr-x  2 runner runner 4.0K Jan  8 21:28 playwright-report
+-rw-r--r--  1 runner runner  190 Jan  8 21:29 summary.txt
+drwxr-xr-x  2 runner runner 4.0K Jan  8 21:28 test-results
