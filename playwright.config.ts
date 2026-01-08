@@ -24,9 +24,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI
-      ? 'https://appgates.github.io/PongPush/'
-      : 'http://localhost:3000',
+    baseURL: 'http://localhost:4173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -49,9 +47,9 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.CI ? undefined : {
+  webServer: {
     command: 'npm run preview',
-    url: 'http://localhost:3000',
+    url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
   },
 });
