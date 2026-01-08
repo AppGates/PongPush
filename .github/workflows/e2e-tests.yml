@@ -61,3 +61,35 @@ jobs:
           name: playwright-screenshots
           path: test-results/
           retention-days: 7
+
+      - name: Push test logs to branch
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          # Create logs directory
+          mkdir -p ci-logs
+
+          # Copy test results
+          if [ -d "test-results" ]; then
+            cp -r test-results ci-logs/ || true
+          fi
+
+          # Copy playwright report
+          if [ -d "playwright-report" ]; then
+            cp -r playwright-report ci-logs/ || true
+          fi
+
+          # Create summary file
+          echo "E2E Test Run - $(date)" > ci-logs/summary.txt
+          echo "Commit: ${{ github.sha }}" >> ci-logs/summary.txt
+          echo "Branch: ${{ github.head_ref }}" >> ci-logs/summary.txt
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add and commit logs
+          git add ci-logs/
+          git commit -m "CI: Add E2E test logs for ${{ github.sha }}" || echo "No changes to commit"
+
+          # Push to the PR branch
+          git push origin HEAD:${{ github.head_ref }} || echo "Failed to push logs"
