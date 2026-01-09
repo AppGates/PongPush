@@ -93,21 +93,32 @@ async function main() {
       const commitMsg = await git.getLatestCommitMessage();
       logger.info(`Commit message: ${commitMsg}`);
 
-      // Get commit log for PR body
-      const commitLog = await git.getCommitLog('main', 'HEAD', 'oneline');
+      // Get commit log for PR body (fetch main branch first to make it available)
+      logger.debug('Fetching main branch for commit comparison...');
+      await git.fetch('origin', 'main');
+      const commitLog = await git.getCommitLog('origin/main', 'HEAD', 'oneline');
 
       // Create PR body
-      const prBody = [
+      const prBodyParts = [
         '## Automated PR',
         '',
         'This PR was automatically created from a claude/** branch.',
         '',
         '### Changes',
-        ...commitLog,
-        '',
+      ];
+
+      if (commitLog.length > 0) {
+        prBodyParts.push(...commitLog, '');
+      } else {
+        prBodyParts.push('- ' + commitMsg, '');
+      }
+
+      prBodyParts.push(
         '---',
-        '**Auto-merge**: This PR will automatically merge when all checks pass.',
-      ].join('\n');
+        '**Auto-merge**: This PR will automatically merge when all checks pass.'
+      );
+
+      const prBody = prBodyParts.join('\n');
 
       // Create PR
       logger.subsection('Creating PR');
