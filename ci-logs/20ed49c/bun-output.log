@@ -1,0 +1,150 @@
+📝 
+📝 ================================
+📝 === Auto PR Workflow Started ===
+📝 ================================
+📝 
+📝 Timestamp: 2026-01-09T17:15:50.086Z
+📝 Commit: 20ed49c4ec9a2ada215d912b383921c81225afae
+📝 
+📝 
+📝 --- Cleaning Up Old Logs ---
+📝 Log directory: ci-logs
+📝 Current commit: 20ed49c
+📝 Dry run: no
+📝 Found 2 log directory(ies)
+🔍 Deleting: 44de33b
+🔍 Preserving: 20ed49c (current commit)
+📝 Cleanup complete: 1 deleted, 1 preserved
+📝 
+📝 
+📝 ==========================
+📝 === Branch Information ===
+📝 ==========================
+📝 
+📝 Branch: claude/workflows-typescript-bun-et9yE
+📝 Ref: refs/heads/claude/workflows-typescript-bun-et9yE
+📝 
+📝 
+📝 ====================================
+📝 === Checking Repository Settings ===
+📝 ====================================
+📝 
+🔍 Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+🔍 Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+📝 Auto-merge allowed: true
+📝 Merge commit allowed: true
+📝 Squash merge allowed: true
+📝 Rebase merge allowed: true
+📝 
+📝 
+📝 ================================
+📝 === Checking for Existing PR ===
+📝 ================================
+📝 
+🔍 Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
+📝 Found existing PR #9 for branch claude/workflows-typescript-bun-et9yE
+📝 PR #9 already exists for branch claude/workflows-typescript-bun-et9yE
+📝 
+📝 --- Existing PR Details ---
+🔍 Running: gh pr view 9 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #9 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 9,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20859719851/job/59935932426",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T17:15:44Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20859719888/job/59935932588",
+      "name": "build",
+      "startedAt": "2026-01-09T17:15:44Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Feature: Organize logs by commit SHA with automatic cleanup"
+}
+📝 Title: Feature: Organize logs by commit SHA with automatic cleanup
+📝 State: OPEN
+📝 Mergeable: MERGEABLE
+📝 Merge state: UNSTABLE
+📝 Auto-merge: disabled
+📝 
+📝 ===========================
+📝 === Enabling Auto-Merge ===
+📝 ===========================
+📝 
+📝 Attempting to enable auto-merge for PR #9...
+📝 Enabling auto-merge for PR #9 with method: merge
+🔍 Running: gh pr merge 9 --auto --merge
+✅ Auto-merge enabled successfully for PR #9
+✅ Auto-merge enabled successfully
+📝 
+📝 =======================
+📝 === Final PR Status ===
+📝 =======================
+📝 
+🔍 Running: gh pr view 9 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #9 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNKNOWN",
+  "mergeable": "UNKNOWN",
+  "number": 9,
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20859719851/job/59935932426",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T17:15:44Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20859719888/job/59935932588",
+      "name": "build",
+      "startedAt": "2026-01-09T17:15:44Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Feature: Organize logs by commit SHA with automatic cleanup"
+}
+📝 Title: Feature: Organize logs by commit SHA with automatic cleanup
+📝 State: MERGED
+📝 Mergeable: UNKNOWN
+📝 Merge state: UNKNOWN
+📝 Auto-merge: disabled
+📝 
+📝 --- Status Checks ---
+📝   - create-pr: IN_PROGRESS
+📝   - build: IN_PROGRESS
+📝 
+📝 
+📝 =========================
+📝 === Workflow Complete ===
+📝 =========================
+📝 
