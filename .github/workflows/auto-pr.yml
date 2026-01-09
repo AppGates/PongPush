@@ -26,11 +26,7 @@ jobs:
       - name: Run Auto PR workflow
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          SHORT_SHA=$(git rev-parse --short=7 HEAD)
-          LOG_DIR="ci-logs/${SHORT_SHA}"
-          mkdir -p "${LOG_DIR}"
-          bun run src/workflows/auto-pr.ts > >(tee "${LOG_DIR}/stdout.log") 2> >(tee "${LOG_DIR}/stderr.log" >&2) || true
+        run: .github/scripts/run-workflow.sh src/workflows/auto-pr.ts
 
       - name: Upload auto-pr logs
         if: always()
