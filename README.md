@@ -9,7 +9,7 @@ Eine **mobile-optimierte TypeScript-Webanwendung** zum Hochladen von Spielberich
 - **📱 Mobile-First Design**: Optimiert für Smartphone-Nutzung
 - **📸 Foto-Upload**: Direktes Aufnehmen oder Auswählen von Fotos
 - **🔐 GitHub Integration**: Automatisches Hochladen ins Repository
-- **🚀 CI/CD Pipeline**: Automatisches Deployment zu GitHub Pages
+- **🚀 CI/CD Pipeline**: Automatisches Deployment zu GitHub Pages mit E2E-Tests und Commit-Verifizierung
 - **⚡ TypeScript**: Type-safe und wartbar
 - **🏗️ Clean Architecture**: UI/Business Logic sauber getrennt
 - **🔄 Backend-ready**: Business Logic kann ohne Änderungen ins Backend verschoben werden
