@@ -7,7 +7,7 @@
 
 import { spawnGhCommand, spawnGitCommand } from './utils/process';
 import { Logger } from './utils/logger';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 
 interface WorkflowRun {
   id: number;
@@ -149,7 +149,7 @@ async function pullLogsFromBranch(branch: string): Promise<boolean> {
   }
 }
 
-function findLogFiles(): string[] {
+function findLogFiles(sha?: string): string[] {
   const logDir = 'ci-logs';
   const logFiles: string[] = [];
 
@@ -157,20 +157,42 @@ function findLogFiles(): string[] {
     return logFiles;
   }
 
-  // Common log file patterns
-  const patterns = [
-    'auto-pr-output.log',
-    'auto-pr-bun-output.log',
-    'job-output.log',
-    'summary.txt',
-    'auto-pr-summary.txt',
-  ];
+  // If SHA is provided, look in the commit-specific directory
+  if (sha) {
+    const shortSha = sha.substring(0, 7);
+    const commitDir = `${logDir}/${shortSha}`;
 
-  for (const pattern of patterns) {
-    const path = `${logDir}/${pattern}`;
-    if (existsSync(path)) {
-      logFiles.push(path);
+    if (existsSync(commitDir)) {
+      const files = readdirSync(commitDir);
+      for (const file of files) {
+        if (file.endsWith('.log') || file.endsWith('.txt')) {
+          logFiles.push(`${commitDir}/${file}`);
+        }
+      }
     }
+    return logFiles;
+  }
+
+  // Otherwise, find all log files in all commit directories
+  try {
+    const entries = readdirSync(logDir, { withFileTypes: true });
+    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+
+    for (const dir of dirs) {
+      const commitDir = `${logDir}/${dir}`;
+      try {
+        const files = readdirSync(commitDir);
+        for (const file of files) {
+          if (file.endsWith('.log') || file.endsWith('.txt')) {
+            logFiles.push(`${commitDir}/${file}`);
+          }
+        }
+      } catch (error) {
+        // Skip directories we can't read
+      }
+    }
+  } catch (error) {
+    // Failed to read log directory
   }
 
   return logFiles;
@@ -263,8 +285,8 @@ async function checkPipeline(skipWait = false): Promise<CheckResult> {
     // Pull logs from branch
     await pullLogsFromBranch(branch);
 
-    // Find and display log files
-    const logFiles = findLogFiles();
+    // Find and display log files for this commit
+    const logFiles = findLogFiles(sha);
     displayLogSummary(logFiles);
 
     // Check for errors
