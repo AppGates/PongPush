@@ -37,6 +37,9 @@ jobs:
           echo "Log directory: ${LOG_DIR}"
           echo ""
 
+          # Create log directory BEFORE running TypeScript (needed for tee)
+          mkdir -p "${LOG_DIR}"
+
           # Run the TypeScript script and capture all output to commit-specific directory
           # The script creates its own logs in the same directory
           if bun run .github/workflows-ts/auto-pr.ts 2>&1 | tee "${LOG_DIR}/bun-output.log"; then
