@@ -1,0 +1,178 @@
+2026-01-09T17:40:31.579Z INFO    [AutoPR] 
+2026-01-09T17:40:31.579Z INFO    [AutoPR] ==================================
+2026-01-09T17:40:31.579Z INFO    [AutoPR] === Cleaning Up Stale Branches ===
+2026-01-09T17:40:31.579Z INFO    [AutoPR] ==================================
+2026-01-09T17:40:31.579Z INFO    [AutoPR] 
+2026-01-09T17:40:31.580Z DEBUG   [AutoPR:Git] Running: git rev-parse --abbrev-ref HEAD
+2026-01-09T17:40:31.596Z DEBUG   [AutoPR:Git] Current branch: claude/workflows-typescript-bun-et9yE
+2026-01-09T17:40:31.610Z INFO    [AutoPR] Found 5 claude branches to check
+2026-01-09T17:40:31.610Z INFO    [AutoPR] Checking 4 other branches for cleanup
+2026-01-09T17:40:31.610Z DEBUG   [AutoPR:Git] Checking if origin/claude/add-playwright-tests-yTtju has commits ahead of origin/main
+2026-01-09T17:40:31.610Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/add-playwright-tests-yTtju
+2026-01-09T17:40:31.624Z DEBUG   [AutoPR:Git] Found 0 commit(s) ahead
+2026-01-09T17:40:31.624Z INFO    [AutoPR]   ❌ claude/add-playwright-tests-yTtju: no commits ahead, deleting...
+2026-01-09T17:40:31.624Z INFO    [AutoPR:Git] Deleting branch claude/add-playwright-tests-yTtju from origin
+2026-01-09T17:40:31.624Z DEBUG   [AutoPR:Git] Running: git push origin --delete claude/add-playwright-tests-yTtju
+2026-01-09T17:40:32.178Z SUCCESS [AutoPR:Git] Successfully deleted branch claude/add-playwright-tests-yTtju from origin
+2026-01-09T17:40:32.178Z DEBUG   [AutoPR:Git] Checking if origin/claude/fix-pipeline-yTtju has commits ahead of origin/main
+2026-01-09T17:40:32.178Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/fix-pipeline-yTtju
+2026-01-09T17:40:32.193Z DEBUG   [AutoPR:Git] Found 0 commit(s) ahead
+2026-01-09T17:40:32.193Z INFO    [AutoPR]   ❌ claude/fix-pipeline-yTtju: no commits ahead, deleting...
+2026-01-09T17:40:32.193Z INFO    [AutoPR:Git] Deleting branch claude/fix-pipeline-yTtju from origin
+2026-01-09T17:40:32.193Z DEBUG   [AutoPR:Git] Running: git push origin --delete claude/fix-pipeline-yTtju
+2026-01-09T17:40:32.875Z SUCCESS [AutoPR:Git] Successfully deleted branch claude/fix-pipeline-yTtju from origin
+2026-01-09T17:40:32.875Z DEBUG   [AutoPR:Git] Checking if origin/claude/gitlab-api-github-action-z2DOZ has commits ahead of origin/main
+2026-01-09T17:40:32.875Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/gitlab-api-github-action-z2DOZ
+2026-01-09T17:40:32.890Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T17:40:32.890Z DEBUG   [AutoPR]   ✅ claude/gitlab-api-github-action-z2DOZ: has commits, keeping
+2026-01-09T17:40:32.890Z DEBUG   [AutoPR:Git] Checking if origin/claude/test-git-log-fix-et9yE has commits ahead of origin/main
+2026-01-09T17:40:32.890Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/test-git-log-fix-et9yE
+2026-01-09T17:40:32.905Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T17:40:32.905Z DEBUG   [AutoPR]   ✅ claude/test-git-log-fix-et9yE: has commits, keeping
+2026-01-09T17:40:32.905Z INFO    [AutoPR] Cleanup complete: 2 deleted, 2 kept
+2026-01-09T17:40:32.905Z INFO    [AutoPR] 
+2026-01-09T17:40:32.905Z INFO    [AutoPR] 
+2026-01-09T17:40:32.905Z INFO    [AutoPR] ==========================
+2026-01-09T17:40:32.905Z INFO    [AutoPR] === Branch Information ===
+2026-01-09T17:40:32.905Z INFO    [AutoPR] ==========================
+2026-01-09T17:40:32.905Z INFO    [AutoPR] 
+2026-01-09T17:40:32.905Z INFO    [AutoPR] Branch: claude/workflows-typescript-bun-et9yE
+2026-01-09T17:40:32.905Z INFO    [AutoPR] Ref: refs/heads/claude/workflows-typescript-bun-et9yE
+2026-01-09T17:40:32.905Z INFO    [AutoPR] 
+2026-01-09T17:40:32.905Z INFO    [AutoPR] 
+2026-01-09T17:40:32.906Z INFO    [AutoPR] ====================================
+2026-01-09T17:40:32.906Z INFO    [AutoPR] === Checking Repository Settings ===
+2026-01-09T17:40:32.906Z INFO    [AutoPR] ====================================
+2026-01-09T17:40:32.906Z INFO    [AutoPR] 
+2026-01-09T17:40:32.906Z DEBUG   [AutoPR:GitHub] Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+2026-01-09T17:40:33.491Z DEBUG   [AutoPR:GitHub] Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+2026-01-09T17:40:33.491Z INFO    [AutoPR] Auto-merge allowed: true
+2026-01-09T17:40:33.491Z INFO    [AutoPR] Merge commit allowed: true
+2026-01-09T17:40:33.491Z INFO    [AutoPR] Squash merge allowed: true
+2026-01-09T17:40:33.491Z INFO    [AutoPR] Rebase merge allowed: true
+2026-01-09T17:40:33.491Z INFO    [AutoPR] 
+2026-01-09T17:40:33.492Z INFO    [AutoPR] 
+2026-01-09T17:40:33.492Z INFO    [AutoPR] ==============================
+2026-01-09T17:40:33.492Z INFO    [AutoPR] === Checking Branch Status ===
+2026-01-09T17:40:33.492Z INFO    [AutoPR] ==============================
+2026-01-09T17:40:33.492Z INFO    [AutoPR] 
+2026-01-09T17:40:33.492Z INFO    [AutoPR:Git] Fetching from origin main (attempt 1/5)
+2026-01-09T17:40:33.492Z DEBUG   [AutoPR:Git] Running: git fetch origin main
+2026-01-09T17:40:33.842Z SUCCESS [AutoPR:Git] Successfully fetched from origin
+2026-01-09T17:40:33.842Z DEBUG   [AutoPR:Git] Checking if HEAD has commits ahead of origin/main
+2026-01-09T17:40:33.842Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..HEAD
+2026-01-09T17:40:33.856Z DEBUG   [AutoPR:Git] Found 7 commit(s) ahead
+2026-01-09T17:40:33.856Z INFO    [AutoPR] Branch has commits ahead of main
+2026-01-09T17:40:33.856Z INFO    [AutoPR] 
+2026-01-09T17:40:33.856Z INFO    [AutoPR] 
+2026-01-09T17:40:33.856Z INFO    [AutoPR] ================================
+2026-01-09T17:40:33.856Z INFO    [AutoPR] === Checking for Existing PR ===
+2026-01-09T17:40:33.856Z INFO    [AutoPR] ================================
+2026-01-09T17:40:33.857Z INFO    [AutoPR] 
+2026-01-09T17:40:33.857Z DEBUG   [AutoPR:GitHub] Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
+2026-01-09T17:40:34.256Z INFO    [AutoPR:GitHub] Found existing PR #10 for branch claude/workflows-typescript-bun-et9yE
+2026-01-09T17:40:34.256Z INFO    [AutoPR] PR #10 already exists for branch claude/workflows-typescript-bun-et9yE
+2026-01-09T17:40:34.256Z INFO    [AutoPR] 
+2026-01-09T17:40:34.256Z INFO    [AutoPR] --- Existing PR Details ---
+2026-01-09T17:40:34.256Z DEBUG   [AutoPR:GitHub] Running: gh pr view 10 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+2026-01-09T17:40:34.815Z DEBUG   [AutoPR:GitHub] PR #10 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 10,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860369799/job/59938170639",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T17:40:26Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860369823/job/59938170697",
+      "name": "build",
+      "startedAt": "2026-01-09T17:40:26Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Feature: Auto-delete merged branches and branches with no commits"
+}
+2026-01-09T17:40:34.816Z INFO    [AutoPR] Title: Feature: Auto-delete merged branches and branches with no commits
+2026-01-09T17:40:34.816Z INFO    [AutoPR] State: OPEN
+2026-01-09T17:40:34.816Z INFO    [AutoPR] Mergeable: MERGEABLE
+2026-01-09T17:40:34.816Z INFO    [AutoPR] Merge state: UNSTABLE
+2026-01-09T17:40:34.816Z INFO    [AutoPR] Auto-merge: disabled
+2026-01-09T17:40:34.816Z INFO    [AutoPR] 
+2026-01-09T17:40:34.816Z INFO    [AutoPR] ===========================
+2026-01-09T17:40:34.816Z INFO    [AutoPR] === Enabling Auto-Merge ===
+2026-01-09T17:40:34.816Z INFO    [AutoPR] ===========================
+2026-01-09T17:40:34.816Z INFO    [AutoPR] 
+2026-01-09T17:40:34.816Z INFO    [AutoPR] Attempting to enable auto-merge for PR #10...
+2026-01-09T17:40:34.816Z INFO    [AutoPR:GitHub] Enabling auto-merge for PR #10 with method: merge
+2026-01-09T17:40:34.816Z DEBUG   [AutoPR:GitHub] Running: gh pr merge 10 --auto --merge
+2026-01-09T17:40:37.705Z SUCCESS [AutoPR:GitHub] Auto-merge enabled successfully for PR #10
+2026-01-09T17:40:37.705Z SUCCESS [AutoPR] Auto-merge enabled successfully
+2026-01-09T17:40:37.705Z INFO    [AutoPR] 
+2026-01-09T17:40:37.705Z INFO    [AutoPR] =======================
+2026-01-09T17:40:37.705Z INFO    [AutoPR] === Final PR Status ===
+2026-01-09T17:40:37.705Z INFO    [AutoPR] =======================
+2026-01-09T17:40:37.705Z INFO    [AutoPR] 
+2026-01-09T17:40:37.705Z DEBUG   [AutoPR:GitHub] Running: gh pr view 10 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+2026-01-09T17:40:38.385Z DEBUG   [AutoPR:GitHub] PR #10 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNKNOWN",
+  "mergeable": "UNKNOWN",
+  "number": 10,
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860369799/job/59938170639",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T17:40:26Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860369823/job/59938170697",
+      "name": "build",
+      "startedAt": "2026-01-09T17:40:26Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Feature: Auto-delete merged branches and branches with no commits"
+}
+2026-01-09T17:40:38.385Z INFO    [AutoPR] Title: Feature: Auto-delete merged branches and branches with no commits
+2026-01-09T17:40:38.385Z INFO    [AutoPR] State: MERGED
+2026-01-09T17:40:38.385Z INFO    [AutoPR] Mergeable: UNKNOWN
+2026-01-09T17:40:38.385Z INFO    [AutoPR] Merge state: UNKNOWN
+2026-01-09T17:40:38.385Z INFO    [AutoPR] Auto-merge: disabled
+2026-01-09T17:40:38.385Z INFO    [AutoPR] 
+2026-01-09T17:40:38.385Z INFO    [AutoPR] --- Status Checks ---
+2026-01-09T17:40:38.385Z INFO    [AutoPR]   - create-pr: IN_PROGRESS
+2026-01-09T17:40:38.385Z INFO    [AutoPR]   - build: IN_PROGRESS
+2026-01-09T17:40:38.385Z INFO    [AutoPR] 
+2026-01-09T17:40:38.385Z INFO    [AutoPR] 
+2026-01-09T17:40:38.385Z INFO    [AutoPR] =========================
+2026-01-09T17:40:38.385Z INFO    [AutoPR] === Workflow Complete ===
+2026-01-09T17:40:38.385Z INFO    [AutoPR] =========================
+2026-01-09T17:40:38.385Z INFO    [AutoPR] 
