@@ -1,0 +1,122 @@
+2026-01-09T17:23:42.823Z INFO    [AutoPR] 
+2026-01-09T17:23:42.823Z INFO    [AutoPR] ====================================
+2026-01-09T17:23:42.823Z INFO    [AutoPR] === Checking Repository Settings ===
+2026-01-09T17:23:42.823Z INFO    [AutoPR] ====================================
+2026-01-09T17:23:42.823Z INFO    [AutoPR] 
+2026-01-09T17:23:42.824Z DEBUG   [AutoPR:GitHub] Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+2026-01-09T17:23:43.261Z DEBUG   [AutoPR:GitHub] Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+2026-01-09T17:23:43.261Z INFO    [AutoPR] Auto-merge allowed: true
+2026-01-09T17:23:43.261Z INFO    [AutoPR] Merge commit allowed: true
+2026-01-09T17:23:43.261Z INFO    [AutoPR] Squash merge allowed: true
+2026-01-09T17:23:43.261Z INFO    [AutoPR] Rebase merge allowed: true
+2026-01-09T17:23:43.261Z INFO    [AutoPR] 
+2026-01-09T17:23:43.261Z INFO    [AutoPR] 
+2026-01-09T17:23:43.261Z INFO    [AutoPR] ==============================
+2026-01-09T17:23:43.261Z INFO    [AutoPR] === Checking Branch Status ===
+2026-01-09T17:23:43.261Z INFO    [AutoPR] ==============================
+2026-01-09T17:23:43.261Z INFO    [AutoPR] 
+2026-01-09T17:23:43.262Z INFO    [AutoPR:Git] Fetching from origin main (attempt 1/5)
+2026-01-09T17:23:43.262Z DEBUG   [AutoPR:Git] Running: git fetch origin main
+2026-01-09T17:23:43.461Z SUCCESS [AutoPR:Git] Successfully fetched from origin
+2026-01-09T17:23:43.461Z DEBUG   [AutoPR:Git] Checking if HEAD has commits ahead of origin/main
+2026-01-09T17:23:43.461Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..HEAD
+2026-01-09T17:23:43.475Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T17:23:43.475Z INFO    [AutoPR] Branch has commits ahead of main
+2026-01-09T17:23:43.475Z INFO    [AutoPR] 
+2026-01-09T17:23:43.475Z INFO    [AutoPR] 
+2026-01-09T17:23:43.475Z INFO    [AutoPR] ================================
+2026-01-09T17:23:43.475Z INFO    [AutoPR] === Checking for Existing PR ===
+2026-01-09T17:23:43.475Z INFO    [AutoPR] ================================
+2026-01-09T17:23:43.475Z INFO    [AutoPR] 
+2026-01-09T17:23:43.476Z DEBUG   [AutoPR:GitHub] Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
+2026-01-09T17:23:43.757Z INFO    [AutoPR:GitHub] No existing PR found for branch claude/workflows-typescript-bun-et9yE
+2026-01-09T17:23:43.757Z INFO    [AutoPR] No existing PR found. Creating new PR...
+2026-01-09T17:23:43.758Z DEBUG   [AutoPR:Git] Running: git log -1 --pretty=%s
+2026-01-09T17:23:43.772Z DEBUG   [AutoPR:Git] Latest commit message: Feature: Auto-delete merged branches and branches with no commits
+2026-01-09T17:23:43.772Z INFO    [AutoPR] Commit message: Feature: Auto-delete merged branches and branches with no commits
+2026-01-09T17:23:43.772Z DEBUG   [AutoPR:Git] Running: git log origin/main..HEAD --oneline
+2026-01-09T17:23:43.786Z INFO    [AutoPR] 
+2026-01-09T17:23:43.786Z INFO    [AutoPR] --- Creating PR ---
+2026-01-09T17:23:43.786Z INFO    [AutoPR:GitHub] Creating PR: "Feature: Auto-delete merged branches and branches with no commits"
+2026-01-09T17:23:43.786Z DEBUG   [AutoPR:GitHub] Base: main, Head: claude/workflows-typescript-bun-et9yE
+2026-01-09T17:23:43.786Z DEBUG   [AutoPR:GitHub] Running: gh pr create --title Feature: Auto-delete merged branches and branches with no commits --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+484ed1b Feature: Auto-delete merged branches and branches with no commits
+0dbe127 CI: Add auto-PR logs for 20ed49c4ec9a2ada215d912b383921c81225afae
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/workflows-typescript-bun-et9yE
+2026-01-09T17:23:46.170Z SUCCESS [AutoPR:GitHub] PR created: https://github.com/AppGates/PongPush/pull/10
+2026-01-09T17:23:46.170Z SUCCESS [AutoPR] PR created: https://github.com/AppGates/PongPush/pull/10
+2026-01-09T17:23:46.170Z INFO    [AutoPR] PR Number: 10
+2026-01-09T17:23:46.170Z INFO    [AutoPR] 
+2026-01-09T17:23:46.170Z INFO    [AutoPR] ===========================
+2026-01-09T17:23:46.170Z INFO    [AutoPR] === Enabling Auto-Merge ===
+2026-01-09T17:23:46.170Z INFO    [AutoPR] ===========================
+2026-01-09T17:23:46.171Z INFO    [AutoPR] 
+2026-01-09T17:23:46.171Z INFO    [AutoPR] Attempting to enable auto-merge for PR #10...
+2026-01-09T17:23:46.171Z INFO    [AutoPR:GitHub] Enabling auto-merge for PR #10 with method: merge
+2026-01-09T17:23:46.171Z DEBUG   [AutoPR:GitHub] Running: gh pr merge 10 --auto --merge
+2026-01-09T17:23:47.098Z DEBUG   [AutoPR:GitHub] stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
+2026-01-09T17:23:47.098Z WARN    [AutoPR:GitHub] gh pr merge --auto failed with exit code 1
+2026-01-09T17:23:47.098Z WARN    [AutoPR:GitHub] stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
+2026-01-09T17:23:47.098Z WARN    [AutoPR] Auto-merge command failed
+2026-01-09T17:23:47.098Z INFO    [AutoPR] 
+2026-01-09T17:23:47.098Z INFO    [AutoPR] =======================
+2026-01-09T17:23:47.098Z INFO    [AutoPR] === Final PR Status ===
+2026-01-09T17:23:47.098Z INFO    [AutoPR] =======================
+2026-01-09T17:23:47.098Z INFO    [AutoPR] 
+2026-01-09T17:23:47.099Z DEBUG   [AutoPR:GitHub] Running: gh pr view 10 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+2026-01-09T17:23:47.619Z DEBUG   [AutoPR:GitHub] PR #10 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 10,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20859926738/job/59936654948",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T17:23:37Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20859926767/job/59936655011",
+      "name": "build",
+      "startedAt": "2026-01-09T17:23:37Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Feature: Auto-delete merged branches and branches with no commits"
+}
+2026-01-09T17:23:47.619Z INFO    [AutoPR] Title: Feature: Auto-delete merged branches and branches with no commits
+2026-01-09T17:23:47.619Z INFO    [AutoPR] State: OPEN
+2026-01-09T17:23:47.619Z INFO    [AutoPR] Mergeable: MERGEABLE
+2026-01-09T17:23:47.619Z INFO    [AutoPR] Merge state: UNSTABLE
+2026-01-09T17:23:47.619Z INFO    [AutoPR] Auto-merge: disabled
+2026-01-09T17:23:47.619Z INFO    [AutoPR] 
+2026-01-09T17:23:47.619Z INFO    [AutoPR] --- Status Checks ---
+2026-01-09T17:23:47.619Z INFO    [AutoPR]   - create-pr: IN_PROGRESS
+2026-01-09T17:23:47.619Z INFO    [AutoPR]   - build: IN_PROGRESS
+2026-01-09T17:23:47.619Z INFO    [AutoPR] 
+2026-01-09T17:23:47.619Z INFO    [AutoPR] 
+2026-01-09T17:23:47.619Z INFO    [AutoPR] =========================
+2026-01-09T17:23:47.619Z INFO    [AutoPR] === Workflow Complete ===
+2026-01-09T17:23:47.619Z INFO    [AutoPR] =========================
+2026-01-09T17:23:47.619Z INFO    [AutoPR] 
