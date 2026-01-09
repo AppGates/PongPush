@@ -3,11 +3,15 @@
 /**
  * Auto PR Workflow
  * Automatically creates a PR for claude/** branches and enables auto-merge
+ *
+ * Logs are organized by commit SHA and automatically cleaned up
  */
 
 import { Logger } from './utils/logger';
 import { GitHubClient } from './utils/github';
 import { GitClient } from './utils/git';
+import { cleanupOldLogs, ensureCommitLogDir } from './utils/log-cleanup';
+import * as path from 'path';
 
 interface WorkflowContext {
   sha: string;
@@ -34,19 +38,31 @@ async function getWorkflowContext(): Promise<WorkflowContext> {
 }
 
 async function main() {
-  // Initialize logger
-  const logger = new Logger({
-    logFile: 'auto-pr.log',
-    prefix: 'AutoPR',
-  });
-
-  logger.section('Auto PR Workflow Started');
-  logger.info(`Timestamp: ${new Date().toISOString()}`);
-
   try {
-    // Get workflow context
+    // Get workflow context first (need SHA for log directory)
     const ctx = await getWorkflowContext();
+
+    // Setup log directory structure
+    const baseLogDir = 'ci-logs';
+    const commitLogDir = ensureCommitLogDir(baseLogDir, ctx.sha,
+      new Logger({ prefix: 'Setup' }));
+
+    // Initialize logger with commit-specific directory
+    const logger = new Logger({
+      logFile: path.join(commitLogDir, 'auto-pr.log'),
+      prefix: 'AutoPR',
+    });
+
+    logger.section('Auto PR Workflow Started');
+    logger.info(`Timestamp: ${new Date().toISOString()}`);
     logger.info(`Commit: ${ctx.sha}`);
+    logger.info('');
+
+    // Clean up old log directories
+    await cleanupOldLogs({
+      logDir: baseLogDir,
+      currentCommit: ctx.sha,
+    }, logger);
     logger.info('');
 
     logger.section('Branch Information');

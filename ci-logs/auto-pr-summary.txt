@@ -1,9 +1,0 @@
-=== Auto PR Workflow Log ===
-Date: Fri Jan  9 06:37:43 UTC 2026
-Commit: e7909652662fae5af7b9f73d192c14c38dc2699b
-Ref: refs/heads/claude/workflows-typescript-bun-et9yE
-Job: create-pr
-
-Log files:
-  - ci-logs/auto-pr-output.log (main workflow log)
-  - ci-logs/auto-pr-bun-output.log (bun execution output)
