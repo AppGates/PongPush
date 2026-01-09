@@ -2,21 +2,13 @@
 
 /**
  * Pipeline Status Checker
- * Waits for workflow runs to complete and displays results
+ * Waits for CI logs to be pushed and analyzes them for errors
+ * Works by polling the branch and checking for ci-logs/<commit-sha>/
  */
 
-import { spawnGhCommand, spawnGitCommand } from './utils/process';
+import { spawnGitCommand } from './utils/process';
 import { Logger } from './utils/logger';
 import { readFileSync, existsSync, readdirSync } from 'fs';
-
-interface WorkflowRun {
-  id: number;
-  name: string;
-  status: string;
-  conclusion: string | null;
-  html_url: string;
-  created_at: string;
-}
 
 interface CheckResult {
   success: boolean;
@@ -44,108 +36,61 @@ async function getLatestCommitSha(): Promise<string> {
   return result.stdout;
 }
 
-async function getWorkflowRuns(branch: string, sha: string): Promise<WorkflowRun[]> {
+async function pullBranch(branch: string): Promise<boolean> {
   try {
-    const result = await spawnGhCommand(
-      ['run', 'list', '--branch', branch, '--json', 'databaseId,name,status,conclusion,headSha,createdAt,url'],
-      process.env.GITHUB_TOKEN || '',
-      logger
-    );
-
-    if (!result.success) {
-      logger.warn(`gh CLI not available or failed: ${result.stderr}`);
-      return [];
-    }
-
-    const runs = JSON.parse(result.stdout);
-
-    // Filter runs for this specific commit
-    return runs
-      .filter((run: any) => run.headSha === sha)
-      .map((run: any) => ({
-        id: run.databaseId,
-        name: run.name,
-        status: run.status,
-        conclusion: run.conclusion,
-        html_url: run.url,
-        created_at: run.createdAt,
-      }));
+    const result = await spawnGitCommand(['pull', 'origin', branch, '--rebase'], logger);
+    return result.success;
   } catch (error) {
-    logger.warn(`Cannot query GitHub API: ${error}`);
-    return [];
+    return false;
   }
 }
 
-async function waitForCompletion(branch: string, sha: string, timeoutSeconds = 60, skipWait = false): Promise<WorkflowRun[]> {
+async function waitForLogs(branch: string, sha: string, timeoutSeconds = 60, skipWait = false): Promise<boolean> {
   const startTime = Date.now();
-  const pollInterval = 5000; // 5 seconds
+  const pollInterval = 10000; // 10 seconds
+  const shortSha = sha.substring(0, 7);
+  const logDir = `ci-logs/${shortSha}`;
 
-  logger.section('Checking Workflow Status');
+  logger.section('Waiting for CI Logs');
   logger.info(`Branch: ${branch}`);
-  logger.info(`Commit: ${sha.substring(0, 7)}`);
+  logger.info(`Commit: ${shortSha}`);
+  logger.info(`Looking for: ${logDir}/`);
 
   if (skipWait) {
     logger.info('Checking current status only (no waiting)');
   } else {
     logger.info(`Timeout: ${timeoutSeconds}s`);
+    logger.info(`Poll interval: ${pollInterval / 1000}s`);
   }
   logger.info('');
 
   while (true) {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
 
-    if (elapsed > timeoutSeconds && !skipWait) {
-      logger.error(`Timeout after ${timeoutSeconds}s`);
-      throw new Error('Workflow check timeout');
+    // Check if logs directory exists
+    if (existsSync(logDir)) {
+      logger.success(`Found logs at ${logDir}/`);
+      return true;
     }
 
-    const runs = await getWorkflowRuns(branch, sha);
-
-    if (runs.length === 0) {
-      if (skipWait) {
-        logger.warn('No workflow runs found for this commit (gh CLI may not be available)');
-        return [];
-      }
-      logger.info(`[${elapsed}s] No workflow runs found yet, waiting...`);
-      await Bun.sleep(pollInterval);
-      continue;
-    }
-
-    // Check if all runs are complete
-    const allComplete = runs.every(run => run.status === 'completed');
-    const inProgress = runs.filter(run => run.status === 'in_progress').length;
-    const queued = runs.filter(run => run.status === 'queued').length;
-    const completed = runs.filter(run => run.status === 'completed').length;
-
-    logger.info(`[${elapsed}s] Workflows: ${completed} completed, ${inProgress} in progress, ${queued} queued`);
-
-    if (allComplete || skipWait) {
-      if (allComplete) {
-        logger.success('All workflows completed!');
-      }
-      logger.info('');
-      return runs;
-    }
-
-    await Bun.sleep(pollInterval);
-  }
-}
-
-async function pullLogsFromBranch(branch: string): Promise<boolean> {
-  logger.section('Pulling Logs from Branch');
-
-  try {
-    const result = await spawnGitCommand(['pull', 'origin', branch], logger);
-    if (!result.success) {
-      logger.error(`Failed to pull: ${result.stderr}`);
+    if (skipWait) {
+      logger.warn(`Logs not found at ${logDir}/ (workflow may still be running)`);
       return false;
     }
 
-    logger.success('Logs pulled successfully');
-    return true;
-  } catch (error) {
-    logger.error(`Failed to pull logs: ${error}`);
-    return false;
+    if (elapsed >= timeoutSeconds) {
+      logger.warn(`Timeout after ${timeoutSeconds}s - logs not found yet`);
+      logger.info('Workflow may still be running or failed to start');
+      return false;
+    }
+
+    logger.info(`[${elapsed}s] Logs not found yet, pulling branch...`);
+
+    // Pull the branch to get latest commits with logs
+    await pullBranch(branch);
+
+    // Wait before next check
+    await Bun.sleep(pollInterval);
   }
 }
 
@@ -248,23 +193,7 @@ function displayLogErrors(logFiles: string[]): string[] {
   return errors;
 }
 
-function displayRunSummary(runs: WorkflowRun[]): void {
-  logger.section('Workflow Run Summary');
-
-  for (const run of runs) {
-    const icon = run.conclusion === 'success' ? '✅' :
-                 run.conclusion === 'failure' ? '❌' :
-                 run.conclusion === 'cancelled' ? '⚠️' : '❓';
-
-    logger.info(`${icon} ${run.name}`);
-    logger.info(`   Status: ${run.status}`);
-    logger.info(`   Conclusion: ${run.conclusion || 'N/A'}`);
-    logger.info(`   URL: ${run.html_url}`);
-    logger.info('');
-  }
-}
-
-async function checkPipeline(skipWait = false): Promise<CheckResult> {
+async function checkPipeline(skipWait = false, timeoutSeconds = 60): Promise<CheckResult> {
   const startTime = Date.now();
 
   try {
@@ -274,50 +203,52 @@ async function checkPipeline(skipWait = false): Promise<CheckResult> {
     const branch = await getCurrentBranch();
     const sha = await getLatestCommitSha();
 
-    // Wait for workflows to complete (or just check once)
-    const runs = await waitForCompletion(branch, sha, 60, skipWait);
-
-    // Display run summary if we have runs
-    if (runs.length > 0) {
-      displayRunSummary(runs);
-    }
-
-    // Pull logs from branch
-    await pullLogsFromBranch(branch);
+    // Wait for logs to be pushed by CI (or just check once)
+    const logsFound = await waitForLogs(branch, sha, timeoutSeconds, skipWait);
 
     // Find and display log files for this commit
     const logFiles = findLogFiles(sha);
-    displayLogSummary(logFiles);
 
-    // Check for errors
-    const errors = displayLogErrors(logFiles);
+    if (logFiles.length > 0) {
+      displayLogSummary(logFiles);
 
-    // Determine overall success
-    const allSuccess = runs.length === 0 || runs.every(run => run.conclusion === 'success');
-    const duration = Math.floor((Date.now() - startTime) / 1000);
+      // Check for errors in logs
+      const errors = displayLogErrors(logFiles);
 
-    logger.section('Final Result');
-    if (runs.length === 0) {
+      const duration = Math.floor((Date.now() - startTime) / 1000);
+
+      logger.section('Final Result');
       if (errors.length === 0) {
-        logger.info(`No workflow API data available, logs look clean (${duration}s)`);
+        logger.success(`Pipeline passed! (${duration}s)`);
       } else {
-        logger.warn(`No workflow API data, but errors found in logs (${duration}s)`);
+        logger.error(`Pipeline failed with ${errors.length} error(s) (${duration}s)`);
       }
-    } else if (allSuccess && errors.length === 0) {
-      logger.success(`All workflows passed! (${duration}s)`);
-    } else if (!allSuccess) {
-      logger.error(`Some workflows failed! (${duration}s)`);
-    } else {
-      logger.warn(`Workflows passed but errors found in logs (${duration}s)`);
-    }
 
-    return {
-      success: allSuccess && errors.length === 0,
-      duration,
-      conclusion: allSuccess ? 'success' : 'failure',
-      logFiles,
-      errors,
-    };
+      return {
+        success: errors.length === 0,
+        duration,
+        conclusion: errors.length === 0 ? 'success' : 'failure',
+        logFiles,
+        errors,
+      };
+    } else {
+      const duration = Math.floor((Date.now() - startTime) / 1000);
+
+      logger.section('Final Result');
+      if (skipWait) {
+        logger.warn(`No logs found yet - workflow may still be running (${duration}s)`);
+      } else {
+        logger.warn(`Timeout waiting for logs (${duration}s)`);
+      }
+
+      return {
+        success: false,
+        duration,
+        conclusion: 'unknown',
+        logFiles: [],
+        errors: ['No logs found - workflow may not have run or is still in progress'],
+      };
+    }
 
   } catch (error) {
     logger.error(`Pipeline check failed: ${error}`);
@@ -330,6 +261,19 @@ const args = process.argv.slice(2);
 const displayHelp = args.includes('--help') || args.includes('-h');
 const noWait = args.includes('--no-wait');
 
+// Parse timeout argument
+let timeoutSeconds = 60; // default
+const timeoutIndex = args.findIndex(arg => arg === '--timeout' || arg === '-t');
+if (timeoutIndex !== -1 && args[timeoutIndex + 1]) {
+  const parsedTimeout = parseInt(args[timeoutIndex + 1], 10);
+  if (!isNaN(parsedTimeout) && parsedTimeout > 0) {
+    timeoutSeconds = parsedTimeout;
+  } else {
+    console.error('Error: Invalid timeout value. Must be a positive number.');
+    process.exit(1);
+  }
+}
+
 if (displayHelp) {
   console.log(`
 Pipeline Status Checker
@@ -338,34 +282,42 @@ Usage:
   bun run check-pipeline.ts [options]
 
 Options:
-  -h, --help     Show this help message
-  --no-wait      Don't wait for completion, just check current status
+  -h, --help              Show this help message
+  --no-wait               Don't wait for completion, just check current status
+  -t, --timeout <seconds> Timeout in seconds (default: 60)
 
 Description:
-  This script waits for GitHub Actions workflows to complete for the
-  current commit, pulls logs from the branch, and displays a summary.
+  This script waits for GitHub Actions workflows to push CI logs for the
+  current commit. It periodically pulls the branch and checks for logs in
+  ci-logs/<commit-sha>/.
 
-  If gh CLI is not available, it will skip workflow API checks and
-  just analyze the log files in ci-logs/.
+  Once logs are found, it analyzes them for errors and reports the result.
 
-Environment:
-  GITHUB_TOKEN   GitHub token for API access (optional, uses gh CLI)
+How it works:
+  1. Gets current branch and commit SHA
+  2. Polls by pulling the branch every 10 seconds
+  3. Checks if ci-logs/<commit-sha>/ directory exists
+  4. Once found, analyzes log files for errors
+  5. Reports success or failure based on log analysis
 
 Examples:
   # Check pipeline status for current commit
-  bun run .github/workflows-ts/check-pipeline.ts
+  bun run check-pipeline.ts
 
   # Just check logs without waiting
-  bun run .github/workflows-ts/check-pipeline.ts --no-wait
+  bun run check-pipeline.ts --no-wait
+
+  # Wait up to 2 minutes
+  bun run check-pipeline.ts --timeout 120
 
   # After pushing a commit
-  git push && bun run .github/workflows-ts/check-pipeline.ts
+  git push && bun run check-pipeline.ts
 `);
   process.exit(0);
 }
 
 // Run the checker
-checkPipeline(noWait)
+checkPipeline(noWait, timeoutSeconds)
   .then(result => {
     process.exit(result.success ? 0 : 1);
   })
