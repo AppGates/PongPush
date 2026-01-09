@@ -55,13 +55,7 @@ jobs:
 
       - name: Push logs to branch
         if: always() && startsWith(github.ref, 'refs/heads/claude/')
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin ${{ github.ref_name }} || true
-          git add -f ci-logs/
-          git commit -m "CI: Add build logs for ${{ github.sha }}" || true
-          git push origin HEAD:${{ github.ref }} || true
+        run: ./push-logs.sh "build logs"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -147,13 +141,7 @@ jobs:
 
       - name: Push logs to branch
         if: always() && startsWith(github.ref, 'refs/heads/claude/')
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin ${{ github.ref_name }} || true
-          git add -f ci-logs/
-          git commit -m "CI: Add e2e-local logs for ${{ github.sha }}" || true
-          git push origin HEAD:${{ github.ref }} || true
+        run: ./push-logs.sh "e2e-local logs"
 
   e2e-deployed:
     runs-on: ubuntu-latest

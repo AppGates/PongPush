@@ -64,24 +64,44 @@ main().catch((error) => {
   run: ./run-workflow.sh your-workflow.ts
 ```
 
-### 3. Centralized Logging
+### 3. Centralized Logging and Status Tracking
 
 All TypeScript workflows are executed through `./run-workflow.sh` which:
 - Creates log directories by commit SHA in `ci-logs/<commit-sha>/`
 - Redirects stdout to `ci-logs/<commit-sha>/stdout.log`
 - Redirects stderr to `ci-logs/<commit-sha>/stderr.log`
 - Shows output in GitHub Actions console via `tee`
+- **Writes semaphore file**: `<workflow-name>.status` containing "success" or "failed"
 
 **Never bypass this script** - always use `./run-workflow.sh <workflow-file>.ts`
 
-### 4. Workflow Files Must Be Executable
+### 4. Centralized Log Pushing
+
+All workflows must push logs back to the branch using `./push-logs.sh`:
+- Takes one argument: log description (e.g., "build logs")
+- Configures git with github-actions bot credentials
+- Pulls latest changes to avoid conflicts
+- Adds ci-logs/ directory
+- Commits with descriptive message
+- Pushes to current branch
+
+**Usage in GitHub Actions:**
+```yaml
+- name: Push logs to branch
+  if: always() && startsWith(github.ref, 'refs/heads/claude/')
+  run: ./push-logs.sh "build logs"
+```
+
+This ensures the check-pipeline script can detect job status via semaphore files.
+
+### 5. Workflow Files Must Be Executable
 
 Always make TypeScript workflow files executable:
 ```bash
 chmod +x src/workflows/your-workflow.ts
 ```
 
-### 5. Git Operations Best Practices
+### 6. Git Operations Best Practices
 
 **Branch naming:**
 - All Claude branches must start with `claude/`
@@ -97,14 +117,14 @@ chmod +x src/workflows/your-workflow.ts
 - Follow the repository's commit style (check `git log`)
 - Never commit secrets or credentials
 
-### 6. Error Handling
+### 7. Error Handling
 
 - Workflows should fail fast and loudly
 - Never use `|| true` to hide errors in critical commands
 - Use `|| true` only for non-critical operations (like cleanup)
 - Always check exit codes and propagate failures
 
-### 7. Testing and Validation
+### 8. Testing and Validation
 
 Before pushing changes:
 1. Verify syntax is correct
@@ -138,8 +158,10 @@ After pushing changes:
 │   └── <commit-sha>/
 │       ├── stdout.log
 │       ├── stderr.log
-│       └── auto-pr.log
-└── run-workflow.sh         # Centralized workflow executor
+│       ├── <workflow>.log
+│       └── <workflow>.status  # Semaphore: "success" or "failed"
+├── run-workflow.sh         # Centralized workflow executor
+└── push-logs.sh            # Centralized log pusher
 
 ```
 
