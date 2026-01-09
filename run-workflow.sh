@@ -11,6 +11,7 @@ if [ -z "$1" ]; then
 fi
 
 WORKFLOW_FILE="src/workflows/$1"
+WORKFLOW_NAME=$(basename "$1" .ts)
 SHORT_SHA=$(git rev-parse --short=7 HEAD)
 LOG_DIR="ci-logs/${SHORT_SHA}"
 
@@ -28,6 +29,13 @@ EXIT_CODE=$?
 # Wait for background processes (tee) to complete, but don't let wait override our exit code
 wait
 set -e
+
+# Write status semaphore file
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "success" > "${LOG_DIR}/${WORKFLOW_NAME}.status"
+else
+  echo "failed" > "${LOG_DIR}/${WORKFLOW_NAME}.status"
+fi
 
 # Exit with the workflow's exit code
 exit $EXIT_CODE

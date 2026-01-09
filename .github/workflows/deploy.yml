@@ -53,6 +53,16 @@ jobs:
           path: ci-logs/
           retention-days: 7
 
+      - name: Push logs to branch
+        if: always() && startsWith(github.ref, 'refs/heads/claude/')
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin ${{ github.ref_name }} || true
+          git add -f ci-logs/
+          git commit -m "CI: Add build logs for ${{ github.sha }}" || true
+          git push origin HEAD:${{ github.ref }} || true
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -134,6 +144,16 @@ jobs:
           name: playwright-screenshots
           path: ci-logs/test-results/
           retention-days: 7
+
+      - name: Push logs to branch
+        if: always() && startsWith(github.ref, 'refs/heads/claude/')
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin ${{ github.ref_name }} || true
+          git add -f ci-logs/
+          git commit -m "CI: Add e2e-local logs for ${{ github.sha }}" || true
+          git push origin HEAD:${{ github.ref }} || true
 
   e2e-deployed:
     runs-on: ubuntu-latest
