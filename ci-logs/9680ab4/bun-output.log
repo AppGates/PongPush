@@ -1,0 +1,34 @@
+📝 
+📝 ================================
+📝 === Auto PR Workflow Started ===
+📝 ================================
+📝 
+📝 Timestamp: 2026-01-09T17:31:03.510Z
+📝 Commit: 9680ab4c77e2e1cdec541c62b1e664bcbe964f6d
+📝 
+📝 
+📝 --- Cleaning Up Old Logs ---
+📝 Log directory: ci-logs
+📝 Current commit: 9680ab4
+📝 Dry run: no
+📝 Found 2 log directory(ies)
+🔍 Preserving: 9680ab4 (current commit)
+🔍 Deleting: 484ed1b
+📝 Cleanup complete: 1 deleted, 1 preserved
+📝 
+📝 
+📝 ==================================
+📝 === Cleaning Up Stale Branches ===
+📝 ==================================
+📝 
+319 | 
+320 |     logger.info('');
+321 |     logger.section('Workflow Complete');
+322 | 
+323 |   } catch (error) {
+324 |     logger.error(`Workflow failed: ${error}`);
+          ^
+ReferenceError: logger is not defined
+      at main (/home/runner/work/PongPush/PongPush/.github/workflows-ts/auto-pr.ts:324:5)
+
+Bun v1.3.5 (Linux x64 baseline)

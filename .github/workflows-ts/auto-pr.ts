@@ -37,6 +37,72 @@ async function getWorkflowContext(): Promise<WorkflowContext> {
   return { sha, ref, branch, repository, token };
 }
 
+async function cleanupStaleBranches(
+  ctx: WorkflowContext,
+  git: GitClient,
+  github: GitHubClient,
+  logger: Logger
+): Promise<void> {
+  try {
+    // Get all remote claude branches
+    const result = await git.getCurrentBranch();  // Just to test git is working
+
+    // Use a direct spawn to get branch list
+    const { spawnProcess } = await import('./utils/process');
+    const branchResult = await spawnProcess(
+      ['git', 'branch', '-r'],
+      logger,
+      { logCommand: false }
+    );
+
+    if (!branchResult.success) {
+      logger.warn('Could not list branches for cleanup');
+      return;
+    }
+
+    const allBranches = branchResult.stdout
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('origin/claude/'))
+      .map(line => line.replace('origin/', ''));
+
+    logger.info(`Found ${allBranches.length} claude branches to check`);
+
+    // Skip current branch
+    const otherBranches = allBranches.filter(b => b !== ctx.branch);
+
+    if (otherBranches.length === 0) {
+      logger.info('No other branches to check');
+      return;
+    }
+
+    logger.info(`Checking ${otherBranches.length} other branches for cleanup`);
+
+    let deleted = 0;
+    let kept = 0;
+
+    for (const branch of otherBranches) {
+      const hasCommits = await git.hasCommitsAhead('origin/main', `origin/${branch}`);
+
+      if (!hasCommits) {
+        logger.info(`  ❌ ${branch}: no commits ahead, deleting...`);
+        const success = await git.deleteBranch('origin', branch);
+        if (success) {
+          deleted++;
+        }
+      } else {
+        logger.debug(`  ✅ ${branch}: has commits, keeping`);
+        kept++;
+      }
+    }
+
+    logger.info(`Cleanup complete: ${deleted} deleted, ${kept} kept`);
+  } catch (error) {
+    logger.warn(`Branch cleanup failed: ${error}`);
+    // Don't fail the whole workflow if cleanup fails
+  }
+}
+
 async function main() {
   try {
     // Get workflow context first (need SHA for log directory)
@@ -65,14 +131,19 @@ async function main() {
     }, logger);
     logger.info('');
 
+    // Initialize clients (needed for cleanup and PR operations)
+    const github = new GitHubClient(ctx.token, ctx.repository, logger);
+    const git = new GitClient(logger);
+
+    // Clean up stale branches (branches with no commits ahead of main)
+    logger.section('Cleaning Up Stale Branches');
+    await cleanupStaleBranches(ctx, git, github, logger);
+    logger.info('');
+
     logger.section('Branch Information');
     logger.info(`Branch: ${ctx.branch}`);
     logger.info(`Ref: ${ctx.ref}`);
     logger.info('');
-
-    // Initialize clients
-    const github = new GitHubClient(ctx.token, ctx.repository, logger);
-    const git = new GitClient(logger);
 
     // Check repository settings
     logger.section('Checking Repository Settings');
@@ -83,6 +154,42 @@ async function main() {
       logger.info(`Squash merge allowed: ${settings.allow_squash_merge}`);
       logger.info(`Rebase merge allowed: ${settings.allow_rebase_merge}`);
     }
+    logger.info('');
+
+    // Check if branch has commits ahead of main
+    logger.section('Checking Branch Status');
+    await git.fetch('origin', 'main');
+    const hasCommits = await git.hasCommitsAhead('origin/main', 'HEAD');
+
+    if (!hasCommits) {
+      logger.warn('Branch has no commits ahead of main');
+
+      // Check if there's a merged PR to clean up
+      const prNumber = await github.findPullRequest(ctx.branch);
+      if (prNumber) {
+        const prDetails = await github.getPullRequestDetails(prNumber);
+        if (prDetails && prDetails.state === 'MERGED') {
+          logger.info(`PR #${prNumber} is already merged, deleting branch`);
+        } else {
+          logger.info('Branch is up-to-date with main, deleting branch');
+        }
+      } else {
+        logger.info('No commits to create PR, deleting branch');
+      }
+
+      // Delete the branch
+      const deleted = await git.deleteBranch('origin', ctx.branch);
+      if (deleted) {
+        logger.success('Branch deleted successfully');
+      } else {
+        logger.warn('Branch deletion failed, but continuing');
+      }
+
+      logger.section('Workflow Complete');
+      process.exit(0);
+    }
+
+    logger.info(`Branch has commits ahead of main`);
     logger.info('');
 
     // Check if PR already exists
@@ -101,6 +208,20 @@ async function main() {
         logger.info(`Mergeable: ${prDetails.mergeable}`);
         logger.info(`Merge state: ${prDetails.mergeStateStatus}`);
         logger.info(`Auto-merge: ${prDetails.autoMergeRequest ? 'enabled' : 'disabled'}`);
+
+        // If PR is merged, delete the branch
+        if (prDetails.state === 'MERGED') {
+          logger.info('');
+          logger.subsection('Cleaning Up Merged Branch');
+          const deleted = await git.deleteBranch('origin', ctx.branch);
+          if (deleted) {
+            logger.success('Merged branch deleted successfully');
+          } else {
+            logger.warn('Branch deletion failed');
+          }
+          logger.section('Workflow Complete');
+          process.exit(0);
+        }
       }
     } else {
       logger.info('No existing PR found. Creating new PR...');
@@ -109,9 +230,7 @@ async function main() {
       const commitMsg = await git.getLatestCommitMessage();
       logger.info(`Commit message: ${commitMsg}`);
 
-      // Get commit log for PR body (fetch main branch first to make it available)
-      logger.debug('Fetching main branch for commit comparison...');
-      await git.fetch('origin', 'main');
+      // Get commit log for PR body (main branch already fetched)
       const commitLog = await git.getCommitLog('origin/main', 'HEAD', 'oneline');
 
       // Create PR body

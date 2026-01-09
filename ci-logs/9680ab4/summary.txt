@@ -1,0 +1,12 @@
+=== Auto PR Workflow Log ===
+Date: Fri Jan  9 17:31:04 UTC 2026
+Commit: 9680ab4c77e2e1cdec541c62b1e664bcbe964f6d
+Short SHA: 9680ab4
+Ref: refs/heads/claude/workflows-typescript-bun-et9yE
+Job: create-pr
+
+Log files in ci-logs/9680ab4/:
+total 12K
+-rw-r--r-- 1 runner runner 1.5K Jan  9 17:31 auto-pr.log
+-rw-r--r-- 1 runner runner  962 Jan  9 17:31 bun-output.log
+-rw-r--r-- 1 runner runner  233 Jan  9 17:31 summary.txt
