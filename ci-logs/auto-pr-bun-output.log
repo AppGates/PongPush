@@ -3,16 +3,16 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T06:37:37.530Z
-📝 Commit: e7909652662fae5af7b9f73d192c14c38dc2699b
+📝 Timestamp: 2026-01-09T06:49:38.327Z
+📝 Commit: 6249fe66809ac069529e0d6b796c73568614ca92
 📝 
 📝 
 📝 ==========================
 📝 === Branch Information ===
 📝 ==========================
 📝 
-📝 Branch: claude/workflows-typescript-bun-et9yE
-📝 Ref: refs/heads/claude/workflows-typescript-bun-et9yE
+📝 Branch: claude/test-git-log-fix-et9yE
+📝 Ref: refs/heads/claude/test-git-log-fix-et9yE
 📝 
 📝 
 📝 ====================================
@@ -36,66 +36,66 @@
 📝 === Checking for Existing PR ===
 📝 ================================
 📝 
-🔍 Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
-📝 No existing PR found for branch claude/workflows-typescript-bun-et9yE
+🔍 Running: gh pr list --head claude/test-git-log-fix-et9yE --json number --jq .[0].number
+📝 No existing PR found for branch claude/test-git-log-fix-et9yE
 📝 No existing PR found. Creating new PR...
 🔍 Running: git log -1 --pretty=%s
-🔍 Latest commit message: Docs: Update CLAUDE.md with pipeline checker usage
-📝 Commit message: Docs: Update CLAUDE.md with pipeline checker usage
-🔍 Running: git log main..HEAD --oneline
-🔍 stderr: fatal: ambiguous argument 'main..HEAD': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
-❌ git log failed with exit code 128: fatal: ambiguous argument 'main..HEAD': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
+🔍 Latest commit message: Test: Verify git log fix with main branch fetching
+📝 Commit message: Test: Verify git log fix with main branch fetching
+🔍 Fetching main branch for commit comparison...
+📝 Fetching from origin main (attempt 1/5)
+🔍 Running: git fetch origin main
+✅ Successfully fetched from origin
+🔍 Running: git log origin/main..HEAD --oneline
 📝 
 📝 --- Creating PR ---
-📝 Creating PR: "Docs: Update CLAUDE.md with pipeline checker usage"
-🔍 Base: main, Head: claude/workflows-typescript-bun-et9yE
-🔍 Running: gh pr create --title Docs: Update CLAUDE.md with pipeline checker usage --body ## Automated PR
+📝 Creating PR: "Test: Verify git log fix with main branch fetching"
+🔍 Base: main, Head: claude/test-git-log-fix-et9yE
+🔍 Running: gh pr create --title Test: Verify git log fix with main branch fetching --body ## Automated PR
 
 This PR was automatically created from a claude/** branch.
 
 ### Changes
+6249fe6 Test: Verify git log fix with main branch fetching
+acabdf5 CI: Add auto-PR logs for 6dc69be7758db65cbaa6c8442845c2849309273e
 
 ---
-**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/workflows-typescript-bun-et9yE
-✅ PR created: https://github.com/AppGates/PongPush/pull/7
-✅ PR created: https://github.com/AppGates/PongPush/pull/7
-📝 PR Number: 7
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/test-git-log-fix-et9yE
+✅ PR created: https://github.com/AppGates/PongPush/pull/8
+✅ PR created: https://github.com/AppGates/PongPush/pull/8
+📝 PR Number: 8
 📝 
 📝 ===========================
 📝 === Enabling Auto-Merge ===
 📝 ===========================
 📝 
-📝 Attempting to enable auto-merge for PR #7...
-📝 Enabling auto-merge for PR #7 with method: merge
-🔍 Running: gh pr merge 7 --auto --merge
-🔍 stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+📝 Attempting to enable auto-merge for PR #8...
+📝 Enabling auto-merge for PR #8 with method: merge
+🔍 Running: gh pr merge 8 --auto --merge
+🔍 stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
 ⚠️ gh pr merge --auto failed with exit code 1
-⚠️ stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+⚠️ stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
 ⚠️ Auto-merge command failed
 📝 
 📝 =======================
 📝 === Final PR Status ===
 📝 =======================
 📝 
-🔍 Running: gh pr view 7 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #7 details: {
+🔍 Running: gh pr view 8 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #8 details: {
   "autoMergeRequest": null,
   "mergeStateStatus": "UNSTABLE",
   "mergeable": "MERGEABLE",
-  "number": 7,
+  "number": 8,
   "state": "OPEN",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843554811/job/59882402052",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843781693/job/59883041957",
       "name": "create-pr",
-      "startedAt": "2026-01-09T06:37:32Z",
+      "startedAt": "2026-01-09T06:49:34Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
     },
@@ -103,16 +103,16 @@ This PR was automatically created from a claude/** branch.
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843554814/job/59882402041",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843781663/job/59883042009",
       "name": "build",
-      "startedAt": "2026-01-09T06:37:32Z",
+      "startedAt": "2026-01-09T06:49:34Z",
       "status": "IN_PROGRESS",
       "workflowName": "CI/CD Pipeline"
     }
   ],
-  "title": "Docs: Update CLAUDE.md with pipeline checker usage"
+  "title": "Test: Verify git log fix with main branch fetching"
 }
-📝 Title: Docs: Update CLAUDE.md with pipeline checker usage
+📝 Title: Test: Verify git log fix with main branch fetching
 📝 State: OPEN
 📝 Mergeable: MERGEABLE
 📝 Merge state: UNSTABLE
