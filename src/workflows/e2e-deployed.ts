@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
 
 import { execSync } from "child_process";
-import { log } from "./utils/logger";
 
 /**
  * E2E Deployed Testing workflow
@@ -13,6 +12,10 @@ import { log } from "./utils/logger";
 const COMMIT_SHA = process.env.GITHUB_SHA || "";
 const EXPECTED_COMMIT_SHA = process.env.EXPECTED_COMMIT_SHA || COMMIT_SHA;
 const DEPLOYED_SITE_URL = process.env.DEPLOYED_SITE_URL || "https://appgates.github.io/PongPush/";
+
+function log(message: string): void {
+  console.log(message);
+}
 
 function runCommand(command: string, description: string): void {
   log(`📝 === ${description} ===`);

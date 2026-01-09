@@ -2,7 +2,6 @@
 
 import { execSync } from "child_process";
 import { writeFileSync, mkdirSync, existsSync, cpSync } from "fs";
-import { log } from "./utils/logger";
 
 /**
  * E2E Local Testing workflow
@@ -15,6 +14,10 @@ import { log } from "./utils/logger";
 
 const COMMIT_SHA = process.env.GITHUB_SHA || "";
 const GITHUB_REF = process.env.GITHUB_REF || "";
+
+function log(message: string): void {
+  console.log(message);
+}
 
 function runCommand(command: string, description: string): void {
   log(`📝 === ${description} ===`);

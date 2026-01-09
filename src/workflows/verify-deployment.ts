@@ -1,7 +1,5 @@
 #!/usr/bin/env bun
 
-import { log } from "./utils/logger";
-
 /**
  * Verify Deployment workflow
  * - Waits for the correct commit to be deployed to GitHub Pages
@@ -13,6 +11,10 @@ const SITE_URL = "https://appgates.github.io/PongPush/";
 const EXPECTED_COMMIT = process.env.GITHUB_SHA || "";
 const MAX_ATTEMPTS = 30;
 const RETRY_DELAY = 10000; // 10 seconds in milliseconds
+
+function log(message: string): void {
+  console.log(message);
+}
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

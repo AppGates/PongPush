@@ -2,7 +2,6 @@
 
 import { execSync } from "child_process";
 import { writeFileSync, mkdirSync } from "fs";
-import { log } from "./utils/logger";
 
 /**
  * Build workflow
@@ -12,6 +11,10 @@ import { log } from "./utils/logger";
  */
 
 const GITHUB_TOKEN = process.env.VITE_GITHUB_TOKEN || "";
+
+function log(message: string): void {
+  console.log(message);
+}
 
 function runCommand(command: string, description: string): void {
   log(`📝 === ${description} ===`);
