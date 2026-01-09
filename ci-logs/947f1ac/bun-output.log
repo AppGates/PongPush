@@ -3,17 +3,17 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T17:49:13.503Z
-📝 Commit: eea8772ae341342ccaef2e83d09e157ab8dbe16d
+📝 Timestamp: 2026-01-09T17:55:31.281Z
+📝 Commit: 947f1accccdeff11fb0d898eb1c4a703a370f45e
 📝 
 📝 
 📝 --- Cleaning Up Old Logs ---
 📝 Log directory: ci-logs
-📝 Current commit: eea8772
+📝 Current commit: 947f1ac
 📝 Dry run: no
 📝 Found 2 log directory(ies)
-🔍 Deleting: 3261789
-🔍 Preserving: eea8772 (current commit)
+🔍 Deleting: eea8772
+🔍 Preserving: 947f1ac (current commit)
 📝 Cleanup complete: 1 deleted, 1 preserved
 📝 
 📝 
@@ -21,8 +21,10 @@
 📝 === Cleaning Up Stale Branches ===
 📝 ==================================
 📝 
-🔍 Running: git rev-parse --abbrev-ref HEAD
-🔍 Current branch: claude/workflows-typescript-bun-et9yE
+🔍 Fetching all branches from origin...
+📝 Fetching from origin  (attempt 1/5)
+🔍 Running: git fetch origin
+✅ Successfully fetched from origin
 📝 Found 3 claude branches to check
 📝 Checking 2 other branches for cleanup
 🔍 Checking if origin/claude/gitlab-api-github-action-z2DOZ has commits ahead of origin/main
@@ -70,7 +72,7 @@
 ✅ Successfully fetched from origin
 🔍 Checking if HEAD has commits ahead of origin/main
 🔍 Running: git rev-list --count origin/main..HEAD
-🔍 Found 4 commit(s) ahead
+🔍 Found 2 commit(s) ahead
 📝 Branch has commits ahead of main
 📝 
 📝 
@@ -79,25 +81,61 @@
 📝 ================================
 📝 
 🔍 Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
-📝 Found existing PR #11 for branch claude/workflows-typescript-bun-et9yE
-📝 PR #11 already exists for branch claude/workflows-typescript-bun-et9yE
+📝 No existing PR found for branch claude/workflows-typescript-bun-et9yE
+📝 No existing PR found. Creating new PR...
+🔍 Running: git log -1 --pretty=%s
+🔍 Latest commit message: Fix: Fetch all branches before stale branch cleanup
+📝 Commit message: Fix: Fetch all branches before stale branch cleanup
+🔍 Running: git log origin/main..HEAD --oneline
 📝 
-📝 --- Existing PR Details ---
-🔍 Running: gh pr view 11 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #11 details: {
+📝 --- Creating PR ---
+📝 Creating PR: "Fix: Fetch all branches before stale branch cleanup"
+🔍 Base: main, Head: claude/workflows-typescript-bun-et9yE
+🔍 Running: gh pr create --title Fix: Fetch all branches before stale branch cleanup --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+947f1ac Fix: Fetch all branches before stale branch cleanup
+2eb40f1 CI: Add auto-PR logs for eea8772ae341342ccaef2e83d09e157ab8dbe16d
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/workflows-typescript-bun-et9yE
+✅ PR created: https://github.com/AppGates/PongPush/pull/12
+✅ PR created: https://github.com/AppGates/PongPush/pull/12
+📝 PR Number: 12
+📝 
+📝 ===========================
+📝 === Enabling Auto-Merge ===
+📝 ===========================
+📝 
+📝 Attempting to enable auto-merge for PR #12...
+📝 Enabling auto-merge for PR #12 with method: merge
+🔍 Running: gh pr merge 12 --auto --merge
+🔍 stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
+⚠️ gh pr merge --auto failed with exit code 1
+⚠️ stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
+⚠️ Auto-merge command failed
+📝 
+📝 =======================
+📝 === Final PR Status ===
+📝 =======================
+📝 
+🔍 Running: gh pr view 12 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #12 details: {
   "autoMergeRequest": null,
   "mergeStateStatus": "UNSTABLE",
   "mergeable": "MERGEABLE",
-  "number": 11,
+  "number": 12,
   "state": "OPEN",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596973/job/59938940737",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860762804/job/59939486143",
       "name": "create-pr",
-      "startedAt": "2026-01-09T17:49:09Z",
+      "startedAt": "2026-01-09T17:55:26Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
     },
@@ -105,70 +143,19 @@
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596945/job/59938940906",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860762809/job/59939486247",
       "name": "build",
-      "startedAt": "2026-01-09T17:49:09Z",
+      "startedAt": "2026-01-09T17:55:27Z",
       "status": "IN_PROGRESS",
       "workflowName": "CI/CD Pipeline"
     }
   ],
-  "title": "Refactor: Move workflows to src/ and add to build type-checking"
+  "title": "Fix: Fetch all branches before stale branch cleanup"
 }
-📝 Title: Refactor: Move workflows to src/ and add to build type-checking
+📝 Title: Fix: Fetch all branches before stale branch cleanup
 📝 State: OPEN
 📝 Mergeable: MERGEABLE
 📝 Merge state: UNSTABLE
-📝 Auto-merge: disabled
-📝 
-📝 ===========================
-📝 === Enabling Auto-Merge ===
-📝 ===========================
-📝 
-📝 Attempting to enable auto-merge for PR #11...
-📝 Enabling auto-merge for PR #11 with method: merge
-🔍 Running: gh pr merge 11 --auto --merge
-✅ Auto-merge enabled successfully for PR #11
-✅ Auto-merge enabled successfully
-📝 
-📝 =======================
-📝 === Final PR Status ===
-📝 =======================
-📝 
-🔍 Running: gh pr view 11 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #11 details: {
-  "autoMergeRequest": null,
-  "mergeStateStatus": "UNKNOWN",
-  "mergeable": "UNKNOWN",
-  "number": 11,
-  "state": "MERGED",
-  "statusCheckRollup": [
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596973/job/59938940737",
-      "name": "create-pr",
-      "startedAt": "2026-01-09T17:49:09Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "Auto Create PR"
-    },
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596945/job/59938940906",
-      "name": "build",
-      "startedAt": "2026-01-09T17:49:09Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "CI/CD Pipeline"
-    }
-  ],
-  "title": "Refactor: Move workflows to src/ and add to build type-checking"
-}
-📝 Title: Refactor: Move workflows to src/ and add to build type-checking
-📝 State: MERGED
-📝 Mergeable: UNKNOWN
-📝 Merge state: UNKNOWN
 📝 Auto-merge: disabled
 📝 
 📝 --- Status Checks ---
