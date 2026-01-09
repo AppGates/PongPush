@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o pipefail
 
 # Usage: run-workflow.sh <workflow-name>
 # Example: run-workflow.sh auto-pr.ts
@@ -18,4 +19,15 @@ mkdir -p "${LOG_DIR}"
 # Set log file path for the workflow to use with Logger
 export WORKFLOW_LOG_FILE="${LOG_DIR}/workflow.log"
 
+# Run workflow and capture exit code
+# Using explicit variable to ensure error propagation with process substitution
+set +e
 bun run "$WORKFLOW_FILE" > >(tee "${LOG_DIR}/stdout.log") 2> >(tee "${LOG_DIR}/stderr.log" >&2)
+EXIT_CODE=$?
+
+# Wait for background processes (tee) to complete, but don't let wait override our exit code
+wait
+set -e
+
+# Exit with the workflow's exit code
+exit $EXIT_CODE
