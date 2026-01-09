@@ -1,45 +1,85 @@
-2026-01-09T06:26:40.940Z INFO    [AutoPR] 
-2026-01-09T06:26:40.940Z INFO    [AutoPR] ====================================
-2026-01-09T06:26:40.940Z INFO    [AutoPR] === Checking Repository Settings ===
-2026-01-09T06:26:40.940Z INFO    [AutoPR] ====================================
-2026-01-09T06:26:40.940Z INFO    [AutoPR] 
-2026-01-09T06:26:40.940Z DEBUG   [AutoPR:GitHub] Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
-2026-01-09T06:26:41.434Z DEBUG   [AutoPR:GitHub] Repository settings: {
+2026-01-09T06:37:37.531Z INFO    [AutoPR] 
+2026-01-09T06:37:37.531Z INFO    [AutoPR] ====================================
+2026-01-09T06:37:37.531Z INFO    [AutoPR] === Checking Repository Settings ===
+2026-01-09T06:37:37.531Z INFO    [AutoPR] ====================================
+2026-01-09T06:37:37.531Z INFO    [AutoPR] 
+2026-01-09T06:37:37.531Z DEBUG   [AutoPR:GitHub] Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+2026-01-09T06:37:38.108Z DEBUG   [AutoPR:GitHub] Repository settings: {
   "allow_auto_merge": true,
   "allow_merge_commit": true,
   "allow_rebase_merge": true,
   "allow_squash_merge": true
 }
-2026-01-09T06:26:41.434Z INFO    [AutoPR] Auto-merge allowed: true
-2026-01-09T06:26:41.434Z INFO    [AutoPR] Merge commit allowed: true
-2026-01-09T06:26:41.434Z INFO    [AutoPR] Squash merge allowed: true
-2026-01-09T06:26:41.434Z INFO    [AutoPR] Rebase merge allowed: true
-2026-01-09T06:26:41.434Z INFO    [AutoPR] 
-2026-01-09T06:26:41.434Z INFO    [AutoPR] 
-2026-01-09T06:26:41.434Z INFO    [AutoPR] ================================
-2026-01-09T06:26:41.435Z INFO    [AutoPR] === Checking for Existing PR ===
-2026-01-09T06:26:41.435Z INFO    [AutoPR] ================================
-2026-01-09T06:26:41.435Z INFO    [AutoPR] 
-2026-01-09T06:26:41.435Z DEBUG   [AutoPR:GitHub] Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
-2026-01-09T06:26:41.694Z INFO    [AutoPR:GitHub] Found existing PR #5 for branch claude/workflows-typescript-bun-et9yE
-2026-01-09T06:26:41.694Z INFO    [AutoPR] PR #5 already exists for branch claude/workflows-typescript-bun-et9yE
-2026-01-09T06:26:41.694Z INFO    [AutoPR] 
-2026-01-09T06:26:41.694Z INFO    [AutoPR] --- Existing PR Details ---
-2026-01-09T06:26:41.695Z DEBUG   [AutoPR:GitHub] Running: gh pr view 5 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-2026-01-09T06:26:42.172Z DEBUG   [AutoPR:GitHub] PR #5 details: {
+2026-01-09T06:37:38.108Z INFO    [AutoPR] Auto-merge allowed: true
+2026-01-09T06:37:38.108Z INFO    [AutoPR] Merge commit allowed: true
+2026-01-09T06:37:38.109Z INFO    [AutoPR] Squash merge allowed: true
+2026-01-09T06:37:38.109Z INFO    [AutoPR] Rebase merge allowed: true
+2026-01-09T06:37:38.109Z INFO    [AutoPR] 
+2026-01-09T06:37:38.109Z INFO    [AutoPR] 
+2026-01-09T06:37:38.109Z INFO    [AutoPR] ================================
+2026-01-09T06:37:38.109Z INFO    [AutoPR] === Checking for Existing PR ===
+2026-01-09T06:37:38.109Z INFO    [AutoPR] ================================
+2026-01-09T06:37:38.109Z INFO    [AutoPR] 
+2026-01-09T06:37:38.109Z DEBUG   [AutoPR:GitHub] Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
+2026-01-09T06:37:38.474Z INFO    [AutoPR:GitHub] No existing PR found for branch claude/workflows-typescript-bun-et9yE
+2026-01-09T06:37:38.474Z INFO    [AutoPR] No existing PR found. Creating new PR...
+2026-01-09T06:37:38.474Z DEBUG   [AutoPR:Git] Running: git log -1 --pretty=%s
+2026-01-09T06:37:38.488Z DEBUG   [AutoPR:Git] Latest commit message: Docs: Update CLAUDE.md with pipeline checker usage
+2026-01-09T06:37:38.488Z INFO    [AutoPR] Commit message: Docs: Update CLAUDE.md with pipeline checker usage
+2026-01-09T06:37:38.488Z DEBUG   [AutoPR:Git] Running: git log main..HEAD --oneline
+2026-01-09T06:37:38.502Z DEBUG   [AutoPR:Git] stderr: fatal: ambiguous argument 'main..HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+2026-01-09T06:37:38.502Z ERROR   [AutoPR:Git] git log failed with exit code 128: fatal: ambiguous argument 'main..HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+2026-01-09T06:37:38.502Z INFO    [AutoPR] 
+2026-01-09T06:37:38.502Z INFO    [AutoPR] --- Creating PR ---
+2026-01-09T06:37:38.502Z INFO    [AutoPR:GitHub] Creating PR: "Docs: Update CLAUDE.md with pipeline checker usage"
+2026-01-09T06:37:38.502Z DEBUG   [AutoPR:GitHub] Base: main, Head: claude/workflows-typescript-bun-et9yE
+2026-01-09T06:37:38.502Z DEBUG   [AutoPR:GitHub] Running: gh pr create --title Docs: Update CLAUDE.md with pipeline checker usage --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/workflows-typescript-bun-et9yE
+2026-01-09T06:37:40.048Z SUCCESS [AutoPR:GitHub] PR created: https://github.com/AppGates/PongPush/pull/7
+2026-01-09T06:37:40.048Z SUCCESS [AutoPR] PR created: https://github.com/AppGates/PongPush/pull/7
+2026-01-09T06:37:40.048Z INFO    [AutoPR] PR Number: 7
+2026-01-09T06:37:40.048Z INFO    [AutoPR] 
+2026-01-09T06:37:40.048Z INFO    [AutoPR] ===========================
+2026-01-09T06:37:40.048Z INFO    [AutoPR] === Enabling Auto-Merge ===
+2026-01-09T06:37:40.048Z INFO    [AutoPR] ===========================
+2026-01-09T06:37:40.048Z INFO    [AutoPR] 
+2026-01-09T06:37:40.048Z INFO    [AutoPR] Attempting to enable auto-merge for PR #7...
+2026-01-09T06:37:40.049Z INFO    [AutoPR:GitHub] Enabling auto-merge for PR #7 with method: merge
+2026-01-09T06:37:40.049Z DEBUG   [AutoPR:GitHub] Running: gh pr merge 7 --auto --merge
+2026-01-09T06:37:41.317Z DEBUG   [AutoPR:GitHub] stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+2026-01-09T06:37:41.318Z WARN    [AutoPR:GitHub] gh pr merge --auto failed with exit code 1
+2026-01-09T06:37:41.318Z WARN    [AutoPR:GitHub] stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+2026-01-09T06:37:41.318Z WARN    [AutoPR] Auto-merge command failed
+2026-01-09T06:37:41.318Z INFO    [AutoPR] 
+2026-01-09T06:37:41.318Z INFO    [AutoPR] =======================
+2026-01-09T06:37:41.318Z INFO    [AutoPR] === Final PR Status ===
+2026-01-09T06:37:41.318Z INFO    [AutoPR] =======================
+2026-01-09T06:37:41.318Z INFO    [AutoPR] 
+2026-01-09T06:37:41.318Z DEBUG   [AutoPR:GitHub] Running: gh pr view 7 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+2026-01-09T06:37:41.990Z DEBUG   [AutoPR:GitHub] PR #7 details: {
   "autoMergeRequest": null,
   "mergeStateStatus": "UNSTABLE",
   "mergeable": "MERGEABLE",
-  "number": 5,
+  "number": 7,
   "state": "OPEN",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339420/job/59881812137",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843554811/job/59882402052",
       "name": "create-pr",
-      "startedAt": "2026-01-09T06:26:35Z",
+      "startedAt": "2026-01-09T06:37:32Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
     },
@@ -47,80 +87,29 @@
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339419/job/59881812156",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843554814/job/59882402041",
       "name": "build",
-      "startedAt": "2026-01-09T06:26:36Z",
+      "startedAt": "2026-01-09T06:37:32Z",
       "status": "IN_PROGRESS",
       "workflowName": "CI/CD Pipeline"
     }
   ],
-  "title": "Fix: Use Bun.spawn for gh CLI to properly capture stderr"
+  "title": "Docs: Update CLAUDE.md with pipeline checker usage"
 }
-2026-01-09T06:26:42.172Z INFO    [AutoPR] Title: Fix: Use Bun.spawn for gh CLI to properly capture stderr
-2026-01-09T06:26:42.172Z INFO    [AutoPR] State: OPEN
-2026-01-09T06:26:42.172Z INFO    [AutoPR] Mergeable: MERGEABLE
-2026-01-09T06:26:42.172Z INFO    [AutoPR] Merge state: UNSTABLE
-2026-01-09T06:26:42.172Z INFO    [AutoPR] Auto-merge: disabled
-2026-01-09T06:26:42.172Z INFO    [AutoPR] 
-2026-01-09T06:26:42.172Z INFO    [AutoPR] ===========================
-2026-01-09T06:26:42.172Z INFO    [AutoPR] === Enabling Auto-Merge ===
-2026-01-09T06:26:42.172Z INFO    [AutoPR] ===========================
-2026-01-09T06:26:42.172Z INFO    [AutoPR] 
-2026-01-09T06:26:42.172Z INFO    [AutoPR] Attempting to enable auto-merge for PR #5...
-2026-01-09T06:26:42.172Z INFO    [AutoPR:GitHub] Enabling auto-merge for PR #5 with method: merge
-2026-01-09T06:26:42.172Z DEBUG   [AutoPR:GitHub] Running: gh pr merge 5 --auto --merge
-2026-01-09T06:26:44.871Z SUCCESS [AutoPR:GitHub] Auto-merge enabled successfully for PR #5
-2026-01-09T06:26:44.871Z SUCCESS [AutoPR] Auto-merge enabled successfully
-2026-01-09T06:26:44.871Z INFO    [AutoPR] 
-2026-01-09T06:26:44.871Z INFO    [AutoPR] =======================
-2026-01-09T06:26:44.871Z INFO    [AutoPR] === Final PR Status ===
-2026-01-09T06:26:44.871Z INFO    [AutoPR] =======================
-2026-01-09T06:26:44.871Z INFO    [AutoPR] 
-2026-01-09T06:26:44.871Z DEBUG   [AutoPR:GitHub] Running: gh pr view 5 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-2026-01-09T06:26:45.253Z DEBUG   [AutoPR:GitHub] PR #5 details: {
-  "autoMergeRequest": null,
-  "mergeStateStatus": "UNKNOWN",
-  "mergeable": "UNKNOWN",
-  "number": 5,
-  "state": "MERGED",
-  "statusCheckRollup": [
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339420/job/59881812137",
-      "name": "create-pr",
-      "startedAt": "2026-01-09T06:26:35Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "Auto Create PR"
-    },
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339419/job/59881812156",
-      "name": "build",
-      "startedAt": "2026-01-09T06:26:36Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "CI/CD Pipeline"
-    }
-  ],
-  "title": "Fix: Use Bun.spawn for gh CLI to properly capture stderr"
-}
-2026-01-09T06:26:45.254Z INFO    [AutoPR] Title: Fix: Use Bun.spawn for gh CLI to properly capture stderr
-2026-01-09T06:26:45.254Z INFO    [AutoPR] State: MERGED
-2026-01-09T06:26:45.254Z INFO    [AutoPR] Mergeable: UNKNOWN
-2026-01-09T06:26:45.254Z INFO    [AutoPR] Merge state: UNKNOWN
-2026-01-09T06:26:45.254Z INFO    [AutoPR] Auto-merge: disabled
-2026-01-09T06:26:45.254Z INFO    [AutoPR] 
-2026-01-09T06:26:45.254Z INFO    [AutoPR] --- Status Checks ---
-2026-01-09T06:26:45.254Z INFO    [AutoPR]   - create-pr: IN_PROGRESS
-2026-01-09T06:26:45.254Z INFO    [AutoPR]   - build: IN_PROGRESS
-2026-01-09T06:26:45.254Z INFO    [AutoPR] 
-2026-01-09T06:26:45.254Z INFO    [AutoPR] 
-2026-01-09T06:26:45.254Z INFO    [AutoPR] =========================
-2026-01-09T06:26:45.254Z INFO    [AutoPR] === Workflow Complete ===
-2026-01-09T06:26:45.254Z INFO    [AutoPR] =========================
-2026-01-09T06:26:45.254Z INFO    [AutoPR] 
+2026-01-09T06:37:41.990Z INFO    [AutoPR] Title: Docs: Update CLAUDE.md with pipeline checker usage
+2026-01-09T06:37:41.990Z INFO    [AutoPR] State: OPEN
+2026-01-09T06:37:41.990Z INFO    [AutoPR] Mergeable: MERGEABLE
+2026-01-09T06:37:41.990Z INFO    [AutoPR] Merge state: UNSTABLE
+2026-01-09T06:37:41.990Z INFO    [AutoPR] Auto-merge: disabled
+2026-01-09T06:37:41.990Z INFO    [AutoPR] 
+2026-01-09T06:37:41.990Z INFO    [AutoPR] --- Status Checks ---
+2026-01-09T06:37:41.990Z INFO    [AutoPR]   - create-pr: IN_PROGRESS
+2026-01-09T06:37:41.990Z INFO    [AutoPR]   - build: IN_PROGRESS
+2026-01-09T06:37:41.990Z INFO    [AutoPR] 
+2026-01-09T06:37:41.990Z INFO    [AutoPR] 
+2026-01-09T06:37:41.990Z INFO    [AutoPR] =========================
+2026-01-09T06:37:41.990Z INFO    [AutoPR] === Workflow Complete ===
+2026-01-09T06:37:41.990Z INFO    [AutoPR] =========================
+2026-01-09T06:37:41.990Z INFO    [AutoPR] 
 
 === Bun Execution Complete (Success) ===

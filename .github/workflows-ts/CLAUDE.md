@@ -13,8 +13,10 @@ This document outlines the architecture, patterns, and best practices for develo
 │   ├── git.ts             # Git operations wrapper
 │   └── log-pusher.ts      # Log pushing to branch
 ├── auto-pr.ts             # Auto-PR workflow logic
+├── check-pipeline.ts      # Pipeline status checker (for testing)
 ├── package.json           # Dependencies
-└── tsconfig.json          # TypeScript configuration
+├── tsconfig.json          # TypeScript configuration
+└── CLAUDE.md              # This file
 ```
 
 ## Core Principles
@@ -268,6 +270,23 @@ jobs:
 
 ### After Pushing
 
+**Use the pipeline checker tool:**
+```bash
+# Push and wait for completion
+git push && bun run .github/workflows-ts/check-pipeline.ts
+
+# Or just check current logs
+bun run .github/workflows-ts/check-pipeline.ts --no-wait
+```
+
+The `check-pipeline.ts` utility will:
+- Wait for workflows to complete (if gh CLI available)
+- Pull logs from the branch
+- Display log file summaries
+- Scan for errors in logs
+- Show final success/failure status
+
+**Manual checks:**
 1. **Check logs are pushed to branch:**
    ```bash
    git pull origin your-branch
