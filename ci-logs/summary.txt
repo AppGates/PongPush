@@ -1,3 +1,16 @@
-E2E Test Run - Fri Jan  9 05:21:04 UTC 2026
-Commit: 7da4feae5c9624249ab7e3c9abf4e1ebee20f220
-Ref: refs/heads/claude/fix-pipeline-commit-matching-pNyoR
+=== E2E Test Run ===
+Date: Fri Jan  9 06:13:46 UTC 2026
+Commit: 5f99bd0870ee5dbcd3d7f698382b1d06ad107da7
+Ref: refs/heads/claude/workflows-typescript-bun-et9yE
+Job: e2e-local
+
+=== Files ===
+total 52K
+drwxr-xr-x  4 runner runner 4.0K Jan  9 06:12 .
+drwxr-xr-x 14 runner runner 4.0K Jan  9 06:13 ..
+-rw-r--r--  1 runner runner  534 Jan  9 06:12 auto-pr-output.log
+-rw-r--r--  1 runner runner  221 Jan  9 06:12 auto-pr-summary.txt
+-rw-r--r--  1 runner runner  24K Jan  9 06:13 job-output.log
+drwxr-xr-x  2 runner runner 4.0K Jan  9 06:12 playwright-report
+-rw-r--r--  1 runner runner  189 Jan  9 06:13 summary.txt
+drwxr-xr-x  2 runner runner 4.0K Jan  9 06:12 test-results
