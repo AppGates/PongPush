@@ -30,7 +30,7 @@ jobs:
           SHORT_SHA=$(git rev-parse --short=7 HEAD)
           LOG_DIR="ci-logs/${SHORT_SHA}"
           mkdir -p "${LOG_DIR}"
-          bun run src/workflows/auto-pr.ts > >(tee "${LOG_DIR}/stdout.log") 2> >(tee "${LOG_DIR}/stderr.log" >&2) || true
+          bun run src/workflows/auto-pr.ts > >(tee "${LOG_DIR}/stdout.log") 2> >(tee "${LOG_DIR}/stderr.log" >&2)
 
       - name: Upload auto-pr logs
         if: always()
