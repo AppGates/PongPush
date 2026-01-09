@@ -8,7 +8,6 @@
 import { Logger } from './utils/logger';
 import { GitHubClient } from './utils/github';
 import { GitClient } from './utils/git';
-import { LogPusher } from './utils/log-pusher';
 
 interface WorkflowContext {
   sha: string;
@@ -178,18 +177,7 @@ async function main() {
   } catch (error) {
     logger.error(`Workflow failed: ${error}`);
     logger.section('Workflow Complete (with errors)');
-  } finally {
-    // Always push logs
-    try {
-      const logPusher = new LogPusher(logger);
-      await logPusher.pushLogs({
-        logFile: logger.getLogFile(),
-        jobName: 'auto-pr',
-        outputLogName: 'auto-pr-output.log',
-      });
-    } catch (pushError) {
-      logger.error(`Failed to push logs: ${pushError}`);
-    }
+    process.exit(1);
   }
 }
 

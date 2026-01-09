@@ -26,12 +26,69 @@ jobs:
       - name: Run Auto PR workflow
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bun run .github/workflows-ts/auto-pr.ts
+        run: |
+          echo "=== Starting Bun Auto-PR Workflow ===" | tee -a auto-pr.log
+          echo "Timestamp: $(date)" | tee -a auto-pr.log
+          echo "Running: bun run .github/workflows-ts/auto-pr.ts" | tee -a auto-pr.log
+          echo "" | tee -a auto-pr.log
+
+          # Run the TypeScript script and capture all output
+          # The script will handle its own logging, but we also capture everything here
+          if bun run .github/workflows-ts/auto-pr.ts 2>&1 | tee -a auto-pr-bun-output.log; then
+            echo "" | tee -a auto-pr.log
+            echo "=== Bun Execution Complete (Success) ===" | tee -a auto-pr.log
+          else
+            EXIT_CODE=$?
+            echo "" | tee -a auto-pr.log
+            echo "=== Bun Execution Failed ===" | tee -a auto-pr.log
+            echo "Exit code: $EXIT_CODE" | tee -a auto-pr.log
+            cat auto-pr-bun-output.log >> auto-pr.log
+            exit 0  # Don't fail the workflow so logs get pushed
+          fi
 
       - name: Upload auto-pr logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: auto-pr-logs
-          path: auto-pr.log
+          path: |
+            auto-pr.log
+            auto-pr-bun-output.log
           retention-days: 7
+
+      - name: Push logs to branch
+        if: always()
+        run: |
+          # Ensure ci-logs directory exists
+          mkdir -p ci-logs
+
+          # Copy all log files
+          if [ -f "auto-pr.log" ]; then
+            cp auto-pr.log ci-logs/auto-pr-output.log || true
+          fi
+
+          if [ -f "auto-pr-bun-output.log" ]; then
+            cp auto-pr-bun-output.log ci-logs/auto-pr-bun-output.log || true
+          fi
+
+          # Create summary
+          echo "=== Auto PR Workflow Log ===" > ci-logs/auto-pr-summary.txt
+          echo "Date: $(date)" >> ci-logs/auto-pr-summary.txt
+          echo "Commit: ${{ github.sha }}" >> ci-logs/auto-pr-summary.txt
+          echo "Ref: ${{ github.ref }}" >> ci-logs/auto-pr-summary.txt
+          echo "Job: create-pr" >> ci-logs/auto-pr-summary.txt
+          echo "" >> ci-logs/auto-pr-summary.txt
+          echo "Log files:" >> ci-logs/auto-pr-summary.txt
+          echo "  - ci-logs/auto-pr-output.log (main workflow log)" >> ci-logs/auto-pr-summary.txt
+          echo "  - ci-logs/auto-pr-bun-output.log (bun execution output)" >> ci-logs/auto-pr-summary.txt
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add and commit logs
+          git add -f ci-logs/
+          git commit -m "CI: Add auto-PR logs for ${{ github.sha }}" || echo "No changes to commit"
+
+          # Push to the current branch
+          git push origin HEAD:${{ github.ref }} || echo "Failed to push logs"
