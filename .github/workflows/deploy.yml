@@ -35,43 +35,22 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: |
-          echo "=== Installing dependencies ===" | tee -a build.log
-          npm ci 2>&1 | tee -a build.log
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-      - name: Type check
-        run: |
-          echo "=== Running type check ===" | tee -a build.log
-          npm run type-check 2>&1 | tee -a build.log
-
-      - name: Build
+      - name: Run Build workflow
         env:
-          # Inject GitHub token into build
-          # In production, use a fine-grained token with minimal permissions
           VITE_GITHUB_TOKEN: ${{ secrets.PongPushPipelineToken }}
-        run: |
-          echo "=== Building application ===" | tee -a build.log
-          # Inject token into build (will be available as window.__GITHUB_TOKEN__)
-          cat > public/config.js << EOF
-          window.__GITHUB_TOKEN__ = '${{ secrets.PongPushPipelineToken }}';
-          EOF
-          npm run build 2>&1 | tee -a build.log
-
-      - name: Save build logs
-        if: always()
-        run: |
-          mkdir -p job-logs
-          mv build.log job-logs/ || true
-          echo "Build job completed at $(date)" > job-logs/build-summary.txt
-          echo "Exit code: $?" >> job-logs/build-summary.txt
+        run: ./run-workflow.sh build.ts
 
       - name: Upload build logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-logs
-          path: job-logs/
+          path: ci-logs/
           retention-days: 7
 
       - name: Upload artifact
@@ -101,40 +80,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Wait for correct commit to be deployed
-        run: |
-          echo "Waiting for commit ${{ github.sha }} to be deployed..."
-          SITE_URL="https://appgates.github.io/PongPush/"
-          EXPECTED_COMMIT="${{ github.sha }}"
-          MAX_ATTEMPTS=30
-          RETRY_DELAY=10
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-          for i in $(seq 1 $MAX_ATTEMPTS); do
-            echo "Attempt $i/$MAX_ATTEMPTS: Checking if commit $EXPECTED_COMMIT is deployed..."
-
-            # Check if site is accessible
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL" || echo "000")
-
-            if [ "$HTTP_CODE" != "200" ]; then
-              echo "⏳ Website not accessible yet (HTTP $HTTP_CODE), retrying in ${RETRY_DELAY}s..."
-              sleep $RETRY_DELAY
-              continue
-            fi
-
-            # Download page and check for commit ID
-            curl -s "$SITE_URL" > /tmp/index.html
-
-            if grep -q "id=\"commit-$EXPECTED_COMMIT\"" /tmp/index.html; then
-              echo "✅ Correct commit $EXPECTED_COMMIT is deployed!"
-              exit 0
-            else
-              echo "⏳ Commit $EXPECTED_COMMIT not found yet, retrying in ${RETRY_DELAY}s..."
-              sleep $RETRY_DELAY
-            fi
-          done
-
-          echo "❌ Timeout: Commit $EXPECTED_COMMIT was not deployed after $MAX_ATTEMPTS attempts"
-          exit 1
+      - name: Verify deployment
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: ./run-workflow.sh verify-deployment.ts
 
   e2e-local:
     runs-on: ubuntu-latest
@@ -152,39 +106,25 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: |
-          echo "=== Installing dependencies ===" | tee -a e2e-local.log
-          npm ci 2>&1 | tee -a e2e-local.log
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-      - name: Install Playwright Browsers
-        run: |
-          echo "=== Installing Playwright browsers ===" | tee -a e2e-local.log
-          npx playwright install --with-deps chromium 2>&1 | tee -a e2e-local.log
-
-      - name: Build application
-        run: |
-          echo "=== Building application ===" | tee -a e2e-local.log
-          npm run build 2>&1 | tee -a e2e-local.log
-
-      - name: Run E2E tests against local preview
+      - name: Run E2E local tests
         env:
           CI: true
           EXPECTED_COMMIT_SHA: ${{ github.sha }}
-        run: |
-          echo "=== Running E2E tests ===" | tee -a e2e-local.log
-          echo "Commit SHA: ${{ github.sha }}" | tee -a e2e-local.log
-          npm run test 2>&1 | tee -a e2e-local.log
-          TEST_EXIT_CODE=$?
-          echo "Test exit code: $TEST_EXIT_CODE" | tee -a e2e-local.log
-          exit $TEST_EXIT_CODE
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+        run: ./run-workflow.sh e2e-local.ts
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: ci-logs/playwright-report/
           retention-days: 7
 
       - name: Upload test screenshots
@@ -192,50 +132,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-screenshots
-          path: test-results/
+          path: ci-logs/test-results/
           retention-days: 7
-
-      - name: Push test logs to branch
-        if: always()
-        run: |
-          # Create logs directory
-          mkdir -p ci-logs
-
-          # Copy job log file
-          if [ -f "e2e-local.log" ]; then
-            cp e2e-local.log ci-logs/job-output.log || true
-          fi
-
-          # Copy test results
-          if [ -d "test-results" ]; then
-            cp -r test-results ci-logs/ || true
-          fi
-
-          # Copy playwright report
-          if [ -d "playwright-report" ]; then
-            cp -r playwright-report ci-logs/ || true
-          fi
-
-          # Create summary file with more details
-          echo "=== E2E Test Run ===" > ci-logs/summary.txt
-          echo "Date: $(date)" >> ci-logs/summary.txt
-          echo "Commit: ${{ github.sha }}" >> ci-logs/summary.txt
-          echo "Ref: ${{ github.ref }}" >> ci-logs/summary.txt
-          echo "Job: e2e-local" >> ci-logs/summary.txt
-          echo "" >> ci-logs/summary.txt
-          echo "=== Files ===" >> ci-logs/summary.txt
-          ls -lah ci-logs/ >> ci-logs/summary.txt
-
-          # Configure git
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Add and commit logs
-          git add -f ci-logs/
-          git commit -m "CI: Add E2E test logs for ${{ github.sha }}" || echo "No changes to commit"
-
-          # Push to the current branch
-          git push origin HEAD:${{ github.ref }} || echo "Failed to push logs"
 
   e2e-deployed:
     runs-on: ubuntu-latest
@@ -253,11 +151,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - name: Run E2E tests against deployed site
         env:
@@ -265,14 +162,15 @@ jobs:
           TEST_DEPLOYED_SITE: true
           EXPECTED_COMMIT_SHA: ${{ github.sha }}
           DEPLOYED_SITE_URL: https://appgates.github.io/PongPush/
-        run: npm run test
+          GITHUB_SHA: ${{ github.sha }}
+        run: ./run-workflow.sh e2e-deployed.ts
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-deployed
-          path: playwright-report/
+          path: ci-logs/playwright-report/
           retention-days: 7
 
       - name: Upload test screenshots
@@ -280,5 +178,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-screenshots-deployed
-          path: test-results/
+          path: ci-logs/test-results/
           retention-days: 7

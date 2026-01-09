@@ -24,9 +24,4 @@ jobs:
           bun-version: latest
 
       - name: Run branch cleanup
-        run: |
-          echo "=== Starting Branch Cleanup ==="
-          echo "Timestamp: $(date)"
-          echo ""
-
-          bun run src/workflows/cleanup-branches.ts
+        run: ./run-workflow.sh cleanup-branches.ts

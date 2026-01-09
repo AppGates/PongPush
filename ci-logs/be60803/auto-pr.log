@@ -1,0 +1,184 @@
+2026-01-09T20:51:49.730Z INFO    [AutoPR] 
+2026-01-09T20:51:49.731Z INFO    [AutoPR] ==================================
+2026-01-09T20:51:49.731Z INFO    [AutoPR] === Cleaning Up Stale Branches ===
+2026-01-09T20:51:49.731Z INFO    [AutoPR] ==================================
+2026-01-09T20:51:49.731Z INFO    [AutoPR] 
+2026-01-09T20:51:50.100Z INFO    [AutoPR] Found 4 claude branches to check
+2026-01-09T20:51:50.100Z INFO    [AutoPR] Checking 3 other branches for cleanup
+2026-01-09T20:51:50.100Z DEBUG   [AutoPR:Git] Checking if origin/claude/gitlab-api-github-action-z2DOZ has commits ahead of origin/main
+2026-01-09T20:51:50.100Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/gitlab-api-github-action-z2DOZ
+2026-01-09T20:51:50.114Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T20:51:50.115Z DEBUG   [AutoPR]   ✅ claude/gitlab-api-github-action-z2DOZ: has commits, keeping
+2026-01-09T20:51:50.115Z DEBUG   [AutoPR:Git] Checking if origin/claude/test-git-log-fix-et9yE has commits ahead of origin/main
+2026-01-09T20:51:50.115Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/test-git-log-fix-et9yE
+2026-01-09T20:51:50.129Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T20:51:50.129Z DEBUG   [AutoPR]   ✅ claude/test-git-log-fix-et9yE: has commits, keeping
+2026-01-09T20:51:50.129Z DEBUG   [AutoPR:Git] Checking if origin/claude/workflows-typescript-bun-et9yE has commits ahead of origin/main
+2026-01-09T20:51:50.129Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/workflows-typescript-bun-et9yE
+2026-01-09T20:51:50.142Z DEBUG   [AutoPR:Git] Found 1 commit(s) ahead
+2026-01-09T20:51:50.142Z DEBUG   [AutoPR]   ✅ claude/workflows-typescript-bun-et9yE: has commits, keeping
+2026-01-09T20:51:50.142Z INFO    [AutoPR] Cleanup complete: 0 deleted, 3 kept
+2026-01-09T20:51:50.142Z INFO    [AutoPR] 
+2026-01-09T20:51:50.142Z INFO    [AutoPR] 
+2026-01-09T20:51:50.142Z INFO    [AutoPR] ==========================
+2026-01-09T20:51:50.142Z INFO    [AutoPR] === Branch Information ===
+2026-01-09T20:51:50.142Z INFO    [AutoPR] ==========================
+2026-01-09T20:51:50.142Z INFO    [AutoPR] 
+2026-01-09T20:51:50.142Z INFO    [AutoPR] Branch: claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:51:50.142Z INFO    [AutoPR] Ref: refs/heads/claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:51:50.142Z INFO    [AutoPR] 
+2026-01-09T20:51:50.143Z INFO    [AutoPR] 
+2026-01-09T20:51:50.143Z INFO    [AutoPR] ====================================
+2026-01-09T20:51:50.143Z INFO    [AutoPR] === Checking Repository Settings ===
+2026-01-09T20:51:50.143Z INFO    [AutoPR] ====================================
+2026-01-09T20:51:50.143Z INFO    [AutoPR] 
+2026-01-09T20:51:50.143Z DEBUG   [AutoPR:GitHub] Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+2026-01-09T20:51:50.723Z DEBUG   [AutoPR:GitHub] Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+2026-01-09T20:51:50.723Z INFO    [AutoPR] Auto-merge allowed: true
+2026-01-09T20:51:50.723Z INFO    [AutoPR] Merge commit allowed: true
+2026-01-09T20:51:50.723Z INFO    [AutoPR] Squash merge allowed: true
+2026-01-09T20:51:50.723Z INFO    [AutoPR] Rebase merge allowed: true
+2026-01-09T20:51:50.723Z INFO    [AutoPR] 
+2026-01-09T20:51:50.723Z INFO    [AutoPR] 
+2026-01-09T20:51:50.723Z INFO    [AutoPR] ==============================
+2026-01-09T20:51:50.723Z INFO    [AutoPR] === Checking Branch Status ===
+2026-01-09T20:51:50.723Z INFO    [AutoPR] ==============================
+2026-01-09T20:51:50.723Z INFO    [AutoPR] 
+2026-01-09T20:51:50.724Z INFO    [AutoPR:Git] Fetching from origin main (attempt 1/5)
+2026-01-09T20:51:50.724Z DEBUG   [AutoPR:Git] Running: git fetch origin main
+2026-01-09T20:51:51.119Z SUCCESS [AutoPR:Git] Successfully fetched from origin
+2026-01-09T20:51:51.119Z DEBUG   [AutoPR:Git] Checking if HEAD has commits ahead of origin/main
+2026-01-09T20:51:51.119Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..HEAD
+2026-01-09T20:51:51.132Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T20:51:51.132Z INFO    [AutoPR] Branch has commits ahead of main
+2026-01-09T20:51:51.132Z INFO    [AutoPR] 
+2026-01-09T20:51:51.132Z INFO    [AutoPR] 
+2026-01-09T20:51:51.132Z INFO    [AutoPR] ================================
+2026-01-09T20:51:51.133Z INFO    [AutoPR] === Checking for Existing PR ===
+2026-01-09T20:51:51.133Z INFO    [AutoPR] ================================
+2026-01-09T20:51:51.133Z INFO    [AutoPR] 
+2026-01-09T20:51:51.133Z DEBUG   [AutoPR:GitHub] Running: gh pr list --head claude/simplify-pr-workflow-fSFY4 --json number --jq .[0].number
+2026-01-09T20:51:51.512Z INFO    [AutoPR:GitHub] No existing PR found for branch claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:51:51.512Z INFO    [AutoPR] No existing PR found. Creating new PR...
+2026-01-09T20:51:51.513Z DEBUG   [AutoPR:Git] Running: git log -1 --pretty=%s
+2026-01-09T20:51:51.527Z DEBUG   [AutoPR:Git] Latest commit message: Update cleanup-branches workflow to use run-workflow.sh
+2026-01-09T20:51:51.527Z INFO    [AutoPR] Commit message: Update cleanup-branches workflow to use run-workflow.sh
+2026-01-09T20:51:51.527Z DEBUG   [AutoPR:Git] Running: git log origin/main..HEAD --oneline
+2026-01-09T20:51:51.540Z INFO    [AutoPR] 
+2026-01-09T20:51:51.540Z INFO    [AutoPR] --- Creating PR ---
+2026-01-09T20:51:51.541Z INFO    [AutoPR:GitHub] Creating PR: "Update cleanup-branches workflow to use run-workflow.sh"
+2026-01-09T20:51:51.541Z DEBUG   [AutoPR:GitHub] Base: main, Head: claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:51:51.541Z DEBUG   [AutoPR:GitHub] Running: gh pr create --title Update cleanup-branches workflow to use run-workflow.sh --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+be60803 Update cleanup-branches workflow to use run-workflow.sh
+6619ed7 CI: Add auto-PR logs for 4ea6e9f96296af9c741cfd2287f6c57978af7de1
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:51:53.094Z SUCCESS [AutoPR:GitHub] PR created: https://github.com/AppGates/PongPush/pull/17
+2026-01-09T20:51:53.094Z SUCCESS [AutoPR] PR created: https://github.com/AppGates/PongPush/pull/17
+2026-01-09T20:51:53.094Z INFO    [AutoPR] PR Number: 17
+2026-01-09T20:51:53.094Z INFO    [AutoPR] 
+2026-01-09T20:51:53.094Z INFO    [AutoPR] ===========================
+2026-01-09T20:51:53.094Z INFO    [AutoPR] === Enabling Auto-Merge ===
+2026-01-09T20:51:53.094Z INFO    [AutoPR] ===========================
+2026-01-09T20:51:53.094Z INFO    [AutoPR] 
+2026-01-09T20:51:53.094Z INFO    [AutoPR] Attempting to enable auto-merge for PR #17...
+2026-01-09T20:51:53.094Z INFO    [AutoPR:GitHub] Enabling auto-merge for PR #17 with method: merge
+2026-01-09T20:51:53.094Z DEBUG   [AutoPR:GitHub] Running: gh pr merge 17 --auto --merge
+2026-01-09T20:51:54.584Z DEBUG   [AutoPR:GitHub] stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+2026-01-09T20:51:54.584Z WARN    [AutoPR:GitHub] gh pr merge --auto failed with exit code 1
+2026-01-09T20:51:54.584Z WARN    [AutoPR:GitHub] stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+2026-01-09T20:51:54.584Z WARN    [AutoPR] Auto-merge command failed
+2026-01-09T20:51:54.584Z INFO    [AutoPR] 
+2026-01-09T20:51:54.584Z INFO    [AutoPR] =======================
+2026-01-09T20:51:54.584Z INFO    [AutoPR] === Final PR Status ===
+2026-01-09T20:51:54.584Z INFO    [AutoPR] =======================
+2026-01-09T20:51:54.584Z INFO    [AutoPR] 
+2026-01-09T20:51:54.585Z DEBUG   [AutoPR:GitHub] Running: gh pr view 17 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+2026-01-09T20:51:55.187Z DEBUG   [AutoPR:GitHub] PR #17 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 17,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865197199/job/59954484832",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T20:51:44Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-01-09T20:51:54Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865197193/job/59954484875",
+      "name": "build",
+      "startedAt": "2026-01-09T20:51:33Z",
+      "status": "COMPLETED",
+      "workflowName": "CI/CD Pipeline"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-01-09T20:51:54Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865197193/job/59954519706",
+      "name": "deploy",
+      "startedAt": "2026-01-09T20:51:54Z",
+      "status": "COMPLETED",
+      "workflowName": "CI/CD Pipeline"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865197193/job/59954519533",
+      "name": "e2e-local",
+      "startedAt": "2026-01-09T20:51:54Z",
+      "status": "QUEUED",
+      "workflowName": "CI/CD Pipeline"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-01-09T20:51:54Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865197193/job/59954519961",
+      "name": "verify",
+      "startedAt": "2026-01-09T20:51:54Z",
+      "status": "COMPLETED",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Update cleanup-branches workflow to use run-workflow.sh"
+}
+2026-01-09T20:51:55.187Z INFO    [AutoPR] Title: Update cleanup-branches workflow to use run-workflow.sh
+2026-01-09T20:51:55.187Z INFO    [AutoPR] State: OPEN
+2026-01-09T20:51:55.187Z INFO    [AutoPR] Mergeable: MERGEABLE
+2026-01-09T20:51:55.187Z INFO    [AutoPR] Merge state: UNSTABLE
+2026-01-09T20:51:55.187Z INFO    [AutoPR] Auto-merge: disabled
+2026-01-09T20:51:55.187Z INFO    [AutoPR] 
+2026-01-09T20:51:55.187Z INFO    [AutoPR] --- Status Checks ---
+2026-01-09T20:51:55.187Z INFO    [AutoPR]   - create-pr: IN_PROGRESS
+2026-01-09T20:51:55.187Z INFO    [AutoPR]   - build: COMPLETED
+2026-01-09T20:51:55.187Z INFO    [AutoPR]   - deploy: COMPLETED
+2026-01-09T20:51:55.187Z INFO    [AutoPR]   - e2e-local: QUEUED
+2026-01-09T20:51:55.187Z INFO    [AutoPR]   - verify: COMPLETED
+2026-01-09T20:51:55.187Z INFO    [AutoPR] 
+2026-01-09T20:51:55.187Z INFO    [AutoPR] 
+2026-01-09T20:51:55.187Z INFO    [AutoPR] =========================
+2026-01-09T20:51:55.187Z INFO    [AutoPR] === Workflow Complete ===
+2026-01-09T20:51:55.187Z INFO    [AutoPR] =========================
+2026-01-09T20:51:55.187Z INFO    [AutoPR] 
