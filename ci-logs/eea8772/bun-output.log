@@ -3,17 +3,17 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T17:46:32.082Z
-📝 Commit: 326178918d086608f932c415e023c6df50ceed4e
+📝 Timestamp: 2026-01-09T17:49:13.503Z
+📝 Commit: eea8772ae341342ccaef2e83d09e157ab8dbe16d
 📝 
 📝 
 📝 --- Cleaning Up Old Logs ---
 📝 Log directory: ci-logs
-📝 Current commit: 3261789
+📝 Current commit: eea8772
 📝 Dry run: no
 📝 Found 2 log directory(ies)
-🔍 Preserving: 3261789 (current commit)
-🔍 Deleting: a4fa790
+🔍 Deleting: 3261789
+🔍 Preserving: eea8772 (current commit)
 📝 Cleanup complete: 1 deleted, 1 preserved
 📝 
 📝 
@@ -70,7 +70,7 @@
 ✅ Successfully fetched from origin
 🔍 Checking if HEAD has commits ahead of origin/main
 🔍 Running: git rev-list --count origin/main..HEAD
-🔍 Found 2 commit(s) ahead
+🔍 Found 4 commit(s) ahead
 📝 Branch has commits ahead of main
 📝 
 📝 
@@ -79,29 +79,46 @@
 📝 ================================
 📝 
 🔍 Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
-📝 No existing PR found for branch claude/workflows-typescript-bun-et9yE
-📝 No existing PR found. Creating new PR...
-🔍 Running: git log -1 --pretty=%s
-🔍 Latest commit message: Refactor: Move workflows to src/ and add to build type-checking
-📝 Commit message: Refactor: Move workflows to src/ and add to build type-checking
-🔍 Running: git log origin/main..HEAD --oneline
+📝 Found existing PR #11 for branch claude/workflows-typescript-bun-et9yE
+📝 PR #11 already exists for branch claude/workflows-typescript-bun-et9yE
 📝 
-📝 --- Creating PR ---
-📝 Creating PR: "Refactor: Move workflows to src/ and add to build type-checking"
-🔍 Base: main, Head: claude/workflows-typescript-bun-et9yE
-🔍 Running: gh pr create --title Refactor: Move workflows to src/ and add to build type-checking --body ## Automated PR
-
-This PR was automatically created from a claude/** branch.
-
-### Changes
-3261789 Refactor: Move workflows to src/ and add to build type-checking
-70d0d7a CI: Add auto-PR logs for a4fa7902ea74dbe387ec2603215b5a9e5eb9b7c6
-
----
-**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/workflows-typescript-bun-et9yE
-✅ PR created: https://github.com/AppGates/PongPush/pull/11
-✅ PR created: https://github.com/AppGates/PongPush/pull/11
-📝 PR Number: 11
+📝 --- Existing PR Details ---
+🔍 Running: gh pr view 11 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #11 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 11,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596973/job/59938940737",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T17:49:09Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596945/job/59938940906",
+      "name": "build",
+      "startedAt": "2026-01-09T17:49:09Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Refactor: Move workflows to src/ and add to build type-checking"
+}
+📝 Title: Refactor: Move workflows to src/ and add to build type-checking
+📝 State: OPEN
+📝 Mergeable: MERGEABLE
+📝 Merge state: UNSTABLE
+📝 Auto-merge: disabled
 📝 
 📝 ===========================
 📝 === Enabling Auto-Merge ===
@@ -110,10 +127,8 @@ This PR was automatically created from a claude/** branch.
 📝 Attempting to enable auto-merge for PR #11...
 📝 Enabling auto-merge for PR #11 with method: merge
 🔍 Running: gh pr merge 11 --auto --merge
-🔍 stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
-⚠️ gh pr merge --auto failed with exit code 1
-⚠️ stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
-⚠️ Auto-merge command failed
+✅ Auto-merge enabled successfully for PR #11
+✅ Auto-merge enabled successfully
 📝 
 📝 =======================
 📝 === Final PR Status ===
@@ -125,15 +140,15 @@ This PR was automatically created from a claude/** branch.
   "mergeStateStatus": "UNKNOWN",
   "mergeable": "UNKNOWN",
   "number": 11,
-  "state": "OPEN",
+  "state": "MERGED",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860526128/job/59938703021",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596973/job/59938940737",
       "name": "create-pr",
-      "startedAt": "2026-01-09T17:46:26Z",
+      "startedAt": "2026-01-09T17:49:09Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
     },
@@ -141,9 +156,9 @@ This PR was automatically created from a claude/** branch.
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860526125/job/59938703024",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20860596945/job/59938940906",
       "name": "build",
-      "startedAt": "2026-01-09T17:46:26Z",
+      "startedAt": "2026-01-09T17:49:09Z",
       "status": "IN_PROGRESS",
       "workflowName": "CI/CD Pipeline"
     }
@@ -151,7 +166,7 @@ This PR was automatically created from a claude/** branch.
   "title": "Refactor: Move workflows to src/ and add to build type-checking"
 }
 📝 Title: Refactor: Move workflows to src/ and add to build type-checking
-📝 State: OPEN
+📝 State: MERGED
 📝 Mergeable: UNKNOWN
 📝 Merge state: UNKNOWN
 📝 Auto-merge: disabled
