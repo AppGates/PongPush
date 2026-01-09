@@ -6,11 +6,31 @@ const TEST_DEPLOYED_SITE = process.env.TEST_DEPLOYED_SITE === 'true';
 const DEPLOYED_SITE_URL = process.env.DEPLOYED_SITE_URL || 'https://appgates.github.io/PongPush/';
 
 /**
+ * Structured logging for E2E tests
+ */
+function log(level: 'INFO' | 'WARN' | 'ERROR', message: string, data?: unknown): void {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    level,
+    component: 'E2E-Test',
+    message,
+    data,
+  };
+
+  // Output as JSON for CI parsing
+  if (process.env.CI === 'true') {
+    console.log(JSON.stringify(entry));
+  } else {
+    console.log(`[${level}] ${message}`, data || '');
+  }
+}
+
+/**
  * Wait for the correct commit version to be deployed
  * This ensures we test the page that matches the commit we're testing
  */
 async function waitForCorrectCommit(page: Page, expectedSha: string, maxRetries = 30, retryDelayMs = 10000): Promise<void> {
-  console.log(`🔍 Waiting for commit ${expectedSha} to be deployed...`);
+  log('INFO', 'Waiting for commit to be deployed', { expectedSha, maxRetries });
 
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -20,25 +40,34 @@ async function waitForCorrectCommit(page: Page, expectedSha: string, maxRetries 
       const commitElement = page.locator(`#commit-${expectedSha}`);
       const exists = await commitElement.count() > 0;
 
-      console.log(`Attempt ${i + 1}/${maxRetries}: Checking for element #commit-${expectedSha} - ${exists ? 'Found' : 'Not found'}`);
+      log('INFO', 'Checking for deployed commit', {
+        attempt: i + 1,
+        maxRetries,
+        expectedSha,
+        found: exists
+      });
 
       if (exists) {
-        console.log(`✅ Correct commit ${expectedSha} is deployed!`);
+        log('INFO', 'Correct commit is deployed', { expectedSha });
         return;
       }
 
       if (i < maxRetries - 1) {
-        console.log(`⏳ Waiting ${retryDelayMs / 1000}s before retry...`);
+        log('INFO', 'Waiting before retry', { delaySeconds: retryDelayMs / 1000 });
         await page.waitForTimeout(retryDelayMs);
       }
     } catch (error) {
-      console.warn(`Attempt ${i + 1} failed:`, error);
+      log('WARN', 'Attempt failed', {
+        attempt: i + 1,
+        error: error instanceof Error ? error.message : String(error)
+      });
       if (i < maxRetries - 1) {
         await page.waitForTimeout(retryDelayMs);
       }
     }
   }
 
+  log('ERROR', 'Timeout waiting for commit', { expectedSha, maxRetries });
   throw new Error(`Timeout: Commit ${expectedSha} was not deployed after ${maxRetries} attempts`);
 }
 
@@ -51,17 +80,19 @@ async function verifyCommitSha(page: Page): Promise<void> {
       const commitElement = page.locator(`#commit-${EXPECTED_COMMIT_SHA}`);
       const count = await commitElement.count();
       if (count > 0) {
-        console.log(`✅ Commit SHA verified: ${EXPECTED_COMMIT_SHA}`);
+        log('INFO', 'Commit SHA verified', { commitSha: EXPECTED_COMMIT_SHA });
       } else {
-        console.warn(`⚠️  Warning: Expected commit element #commit-${EXPECTED_COMMIT_SHA} not found`);
+        log('WARN', 'Expected commit element not found', { commitSha: EXPECTED_COMMIT_SHA });
         // Don't fail the test, just warn
       }
     } catch (error) {
-      console.warn(`⚠️  Warning: Failed to verify commit SHA:`, error);
+      log('WARN', 'Failed to verify commit SHA', {
+        error: error instanceof Error ? error.message : String(error)
+      });
       // Don't fail the test, just warn
     }
   } else {
-    console.log(`ℹ️  No expected commit SHA provided, skipping verification`);
+    log('INFO', 'No expected commit SHA provided, skipping verification');
   }
 }
 
@@ -69,15 +100,18 @@ test.describe('Photo Upload E2E', () => {
   test.beforeEach(async ({ page }) => {
     // If testing deployed site and we have an expected commit, wait for it
     if (TEST_DEPLOYED_SITE && EXPECTED_COMMIT_SHA) {
-      console.log(`🌐 Testing deployed site: ${DEPLOYED_SITE_URL}`);
+      log('INFO', 'Testing deployed site', { url: DEPLOYED_SITE_URL });
       await waitForCorrectCommit(page, EXPECTED_COMMIT_SHA);
     } else {
+      log('INFO', 'Testing local preview');
       // Normal navigation for local tests
       await page.goto('/', { waitUntil: 'networkidle' });
     }
   });
 
   test('should load app and show upload form', async ({ page }) => {
+    log('INFO', 'Starting test: load app and show upload form');
+
     // Verify we're testing the correct commit
     await verifyCommitSha(page);
 
@@ -89,10 +123,12 @@ test.describe('Photo Upload E2E', () => {
     await expect(page.locator('button[type="submit"]')).toBeAttached();
     await expect(page.locator('text=Spielbericht hochladen')).toBeVisible();
 
-    console.log('✅ App loaded successfully with upload form');
+    log('INFO', 'Test passed: app loaded successfully with upload form');
   });
 
   test('should have file input that accepts images', async ({ page }) => {
+    log('INFO', 'Starting test: file input accepts images');
+
     // Verify commit
     await verifyCommitSha(page);
 
@@ -103,10 +139,12 @@ test.describe('Photo Upload E2E', () => {
     const acceptAttr = await fileInput.getAttribute('accept');
     expect(acceptAttr).toContain('image');
 
-    console.log('✅ File input configured correctly');
+    log('INFO', 'Test passed: file input configured correctly', { accept: acceptAttr });
   });
 
   test('should be mobile responsive', async ({ page }) => {
+    log('INFO', 'Starting test: mobile responsive');
+
     // Verify commit
     await verifyCommitSha(page);
 
@@ -118,5 +156,7 @@ test.describe('Photo Upload E2E', () => {
     await expect(page.locator('h1')).toBeVisible();
     // File input is hidden by CSS (custom styling), check if attached instead
     await expect(page.locator('input[type="file"]')).toBeAttached();
+
+    log('INFO', 'Test passed: mobile responsive checks completed');
   });
 });

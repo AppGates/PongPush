@@ -1,0 +1,15 @@
+=== Auto PR Workflow Started ===
+Timestamp: Thu Jan  8 21:39:40 UTC 2026
+Commit: cd66bebbbca9892b83d190184dd067499009fb7e
+
+=== Branch Information ===
+Branch: claude/add-comprehensive-logging-pNyoR
+Ref: refs/heads/claude/add-comprehensive-logging-pNyoR
+
+=== Checking Repository Settings ===
+{"allow_auto_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_squash_merge":true}
+
+=== Checking for Existing PR ===
+
+No existing PR found. Creating new PR...
+Commit message: Fix: Improve error handling in auto-PR workflow

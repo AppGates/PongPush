@@ -6,7 +6,7 @@ on:
       - 'claude/**'
 
 permissions:
-  contents: read
+  contents: write  # Need write to push logs
   pull-requests: write
 
 jobs:
@@ -22,19 +22,41 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          echo "=== Auto PR Workflow Started ===" | tee -a auto-pr.log
+          echo "Timestamp: $(date)" | tee -a auto-pr.log
+          echo "Commit: ${{ github.sha }}" | tee -a auto-pr.log
+          echo "" | tee -a auto-pr.log
+
           # Extract branch name
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-          echo "Branch: $BRANCH_NAME"
+          echo "=== Branch Information ===" | tee -a auto-pr.log
+          echo "Branch: $BRANCH_NAME" | tee -a auto-pr.log
+          echo "Ref: ${GITHUB_REF}" | tee -a auto-pr.log
+          echo "" | tee -a auto-pr.log
+
+          # Check repository settings
+          echo "=== Checking Repository Settings ===" | tee -a auto-pr.log
+          gh api repos/${{ github.repository }} --jq '{allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}' 2>&1 | tee -a auto-pr.log
+          echo "" | tee -a auto-pr.log
 
           # Check if PR already exists
-          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
+          echo "=== Checking for Existing PR ===" | tee -a auto-pr.log
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>&1 | tee -a auto-pr.log)
 
           if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists for branch $BRANCH_NAME"
+            echo "PR #$EXISTING_PR already exists for branch $BRANCH_NAME" | tee -a auto-pr.log
             PR_NUMBER=$EXISTING_PR
+
+            # Get PR details
+            echo "" | tee -a auto-pr.log
+            echo "=== Existing PR Details ===" | tee -a auto-pr.log
+            gh pr view "$PR_NUMBER" --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest 2>&1 | tee -a auto-pr.log
           else
+            echo "No existing PR found. Creating new PR..." | tee -a auto-pr.log
+
             # Get commit message for PR title
             COMMIT_MSG=$(git log -1 --pretty=%s)
+            echo "Commit message: $COMMIT_MSG" | tee -a auto-pr.log
 
             # Create PR body file
             cat > /tmp/pr-body.md << 'EOFBODY'
@@ -53,19 +75,109 @@ jobs:
             echo "**Auto-merge**: This PR will automatically merge when all checks pass." >> /tmp/pr-body.md
 
             # Create PR
-            echo "Creating PR for $BRANCH_NAME..."
-            PR_URL=$(gh pr create \
+            echo "" | tee -a auto-pr.log
+            echo "=== Creating PR ===" | tee -a auto-pr.log
+
+            set +e  # Don't exit on error
+            PR_CREATE_OUTPUT=$(gh pr create \
               --title "$COMMIT_MSG" \
               --body-file /tmp/pr-body.md \
               --base main \
-              --head "$BRANCH_NAME")
+              --head "$BRANCH_NAME" 2>&1)
+            PR_CREATE_EXIT_CODE=$?
+            set -e
 
-            echo "PR created: $PR_URL"
-            PR_NUMBER=$(gh pr view "$BRANCH_NAME" --json number --jq '.number')
+            echo "$PR_CREATE_OUTPUT" | tee -a auto-pr.log
+            echo "PR create exit code: $PR_CREATE_EXIT_CODE" | tee -a auto-pr.log
+
+            if [ $PR_CREATE_EXIT_CODE -eq 0 ]; then
+              PR_URL="$PR_CREATE_OUTPUT"
+              echo "✅ PR created: $PR_URL" | tee -a auto-pr.log
+              PR_NUMBER=$(gh pr view "$BRANCH_NAME" --json number --jq '.number' 2>&1 | tee -a auto-pr.log)
+              echo "PR Number: $PR_NUMBER" | tee -a auto-pr.log
+            else
+              echo "❌ Failed to create PR" | tee -a auto-pr.log
+              echo "Attempting to find PR another way..." | tee -a auto-pr.log
+              PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>&1 | tee -a auto-pr.log)
+              if [ -z "$PR_NUMBER" ]; then
+                echo "❌ Could not find or create PR. Workflow cannot continue." | tee -a auto-pr.log
+                echo "" | tee -a auto-pr.log
+                echo "=== Workflow Complete (with errors) ===" | tee -a auto-pr.log
+                exit 0  # Exit gracefully so logs are pushed
+              fi
+            fi
+          fi
+
+          # Only proceed if we have a PR number
+          if [ -z "$PR_NUMBER" ]; then
+            echo "❌ No PR number available. Cannot enable auto-merge." | tee -a auto-pr.log
+            exit 0
           fi
 
           # Enable auto-merge
-          echo "Enabling auto-merge for PR #$PR_NUMBER..."
-          gh pr merge "$PR_NUMBER" --auto --merge || echo "Auto-merge already enabled or not available"
+          echo "" | tee -a auto-pr.log
+          echo "=== Enabling Auto-Merge ===" | tee -a auto-pr.log
+          echo "Attempting to enable auto-merge for PR #$PR_NUMBER..." | tee -a auto-pr.log
 
-          echo "✅ Done! PR will auto-merge when checks pass."
+          set +e  # Don't exit on error
+          AUTO_MERGE_OUTPUT=$(gh pr merge "$PR_NUMBER" --auto --merge 2>&1)
+          AUTO_MERGE_EXIT_CODE=$?
+          set -e
+
+          echo "$AUTO_MERGE_OUTPUT" | tee -a auto-pr.log
+          echo "Exit code: $AUTO_MERGE_EXIT_CODE" | tee -a auto-pr.log
+
+          if [ $AUTO_MERGE_EXIT_CODE -eq 0 ]; then
+            echo "✅ Auto-merge enabled successfully" | tee -a auto-pr.log
+          else
+            echo "⚠️  Auto-merge command failed" | tee -a auto-pr.log
+          fi
+
+          # Check PR status after attempting auto-merge
+          echo "" | tee -a auto-pr.log
+          echo "=== Final PR Status ===" | tee -a auto-pr.log
+          set +e
+          gh pr view "$PR_NUMBER" --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup 2>&1 | tee -a auto-pr.log
+          set -e
+
+          echo "" | tee -a auto-pr.log
+          echo "=== Workflow Complete ===" | tee -a auto-pr.log
+
+      - name: Upload auto-pr logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-pr-logs
+          path: auto-pr.log
+          retention-days: 7
+
+      - name: Push logs to branch
+        if: always()
+        run: |
+          # Create logs directory
+          mkdir -p ci-logs
+
+          # Copy job log
+          if [ -f "auto-pr.log" ]; then
+            cp auto-pr.log ci-logs/auto-pr-output.log || true
+          fi
+
+          # Create summary
+          echo "=== Auto PR Workflow Log ===" > ci-logs/auto-pr-summary.txt
+          echo "Date: $(date)" >> ci-logs/auto-pr-summary.txt
+          echo "Commit: ${{ github.sha }}" >> ci-logs/auto-pr-summary.txt
+          echo "Ref: ${{ github.ref }}" >> ci-logs/auto-pr-summary.txt
+          echo "Job: create-pr" >> ci-logs/auto-pr-summary.txt
+          echo "" >> ci-logs/auto-pr-summary.txt
+          echo "Log file: ci-logs/auto-pr-output.log" >> ci-logs/auto-pr-summary.txt
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add and commit logs
+          git add -f ci-logs/
+          git commit -m "CI: Add auto-PR logs for ${{ github.sha }}" || echo "No changes to commit"
+
+          # Push to the current branch
+          git push origin HEAD:${{ github.ref }} || echo "Failed to push logs"

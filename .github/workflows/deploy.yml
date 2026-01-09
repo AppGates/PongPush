@@ -36,10 +36,14 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          echo "=== Installing dependencies ===" | tee -a build.log
+          npm ci 2>&1 | tee -a build.log
 
       - name: Type check
-        run: npm run type-check
+        run: |
+          echo "=== Running type check ===" | tee -a build.log
+          npm run type-check 2>&1 | tee -a build.log
 
       - name: Build
         env:
@@ -47,11 +51,28 @@ jobs:
           # In production, use a fine-grained token with minimal permissions
           VITE_GITHUB_TOKEN: ${{ secrets.PongPushPipelineToken }}
         run: |
+          echo "=== Building application ===" | tee -a build.log
           # Inject token into build (will be available as window.__GITHUB_TOKEN__)
           cat > public/config.js << EOF
           window.__GITHUB_TOKEN__ = '${{ secrets.PongPushPipelineToken }}';
           EOF
-          npm run build
+          npm run build 2>&1 | tee -a build.log
+
+      - name: Save build logs
+        if: always()
+        run: |
+          mkdir -p job-logs
+          mv build.log job-logs/ || true
+          echo "Build job completed at $(date)" > job-logs/build-summary.txt
+          echo "Exit code: $?" >> job-logs/build-summary.txt
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: job-logs/
+          retention-days: 7
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -132,19 +153,31 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          echo "=== Installing dependencies ===" | tee -a e2e-local.log
+          npm ci 2>&1 | tee -a e2e-local.log
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: |
+          echo "=== Installing Playwright browsers ===" | tee -a e2e-local.log
+          npx playwright install --with-deps chromium 2>&1 | tee -a e2e-local.log
 
       - name: Build application
-        run: npm run build
+        run: |
+          echo "=== Building application ===" | tee -a e2e-local.log
+          npm run build 2>&1 | tee -a e2e-local.log
 
       - name: Run E2E tests against local preview
         env:
           CI: true
           EXPECTED_COMMIT_SHA: ${{ github.sha }}
-        run: npm run test
+        run: |
+          echo "=== Running E2E tests ===" | tee -a e2e-local.log
+          echo "Commit SHA: ${{ github.sha }}" | tee -a e2e-local.log
+          npm run test 2>&1 | tee -a e2e-local.log
+          TEST_EXIT_CODE=$?
+          echo "Test exit code: $TEST_EXIT_CODE" | tee -a e2e-local.log
+          exit $TEST_EXIT_CODE
 
       - name: Upload test results
         if: always()
@@ -168,6 +201,11 @@ jobs:
           # Create logs directory
           mkdir -p ci-logs
 
+          # Copy job log file
+          if [ -f "e2e-local.log" ]; then
+            cp e2e-local.log ci-logs/job-output.log || true
+          fi
+
           # Copy test results
           if [ -d "test-results" ]; then
             cp -r test-results ci-logs/ || true
@@ -178,10 +216,15 @@ jobs:
             cp -r playwright-report ci-logs/ || true
           fi
 
-          # Create summary file
-          echo "E2E Test Run - $(date)" > ci-logs/summary.txt
+          # Create summary file with more details
+          echo "=== E2E Test Run ===" > ci-logs/summary.txt
+          echo "Date: $(date)" >> ci-logs/summary.txt
           echo "Commit: ${{ github.sha }}" >> ci-logs/summary.txt
           echo "Ref: ${{ github.ref }}" >> ci-logs/summary.txt
+          echo "Job: e2e-local" >> ci-logs/summary.txt
+          echo "" >> ci-logs/summary.txt
+          echo "=== Files ===" >> ci-logs/summary.txt
+          ls -lah ci-logs/ >> ci-logs/summary.txt
 
           # Configure git
           git config user.name "github-actions[bot]"
