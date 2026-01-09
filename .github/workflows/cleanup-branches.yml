@@ -1,0 +1,32 @@
+name: Cleanup Merged Branches
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write  # Need write permission to delete branches
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Run branch cleanup
+        run: |
+          echo "=== Starting Branch Cleanup ==="
+          echo "Timestamp: $(date)"
+          echo ""
+
+          bun run .github/workflows-ts/cleanup-branches.ts
