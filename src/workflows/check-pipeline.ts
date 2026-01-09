@@ -264,7 +264,7 @@ function displayRunSummary(runs: WorkflowRun[]): void {
   }
 }
 
-async function checkPipeline(skipWait = false): Promise<CheckResult> {
+async function checkPipeline(skipWait = false, timeoutSeconds = 60): Promise<CheckResult> {
   const startTime = Date.now();
 
   try {
@@ -275,7 +275,7 @@ async function checkPipeline(skipWait = false): Promise<CheckResult> {
     const sha = await getLatestCommitSha();
 
     // Wait for workflows to complete (or just check once)
-    const runs = await waitForCompletion(branch, sha, 60, skipWait);
+    const runs = await waitForCompletion(branch, sha, timeoutSeconds, skipWait);
 
     // Display run summary if we have runs
     if (runs.length > 0) {
@@ -330,6 +330,19 @@ const args = process.argv.slice(2);
 const displayHelp = args.includes('--help') || args.includes('-h');
 const noWait = args.includes('--no-wait');
 
+// Parse timeout argument
+let timeoutSeconds = 60; // default
+const timeoutIndex = args.findIndex(arg => arg === '--timeout' || arg === '-t');
+if (timeoutIndex !== -1 && args[timeoutIndex + 1]) {
+  const parsedTimeout = parseInt(args[timeoutIndex + 1], 10);
+  if (!isNaN(parsedTimeout) && parsedTimeout > 0) {
+    timeoutSeconds = parsedTimeout;
+  } else {
+    console.error('Error: Invalid timeout value. Must be a positive number.');
+    process.exit(1);
+  }
+}
+
 if (displayHelp) {
   console.log(`
 Pipeline Status Checker
@@ -338,8 +351,9 @@ Usage:
   bun run check-pipeline.ts [options]
 
 Options:
-  -h, --help     Show this help message
-  --no-wait      Don't wait for completion, just check current status
+  -h, --help              Show this help message
+  --no-wait               Don't wait for completion, just check current status
+  -t, --timeout <seconds> Timeout in seconds (default: 60)
 
 Description:
   This script waits for GitHub Actions workflows to complete for the
@@ -353,19 +367,22 @@ Environment:
 
 Examples:
   # Check pipeline status for current commit
-  bun run .github/workflows-ts/check-pipeline.ts
+  bun run check-pipeline.ts
 
   # Just check logs without waiting
-  bun run .github/workflows-ts/check-pipeline.ts --no-wait
+  bun run check-pipeline.ts --no-wait
+
+  # Wait up to 2 minutes
+  bun run check-pipeline.ts --timeout 120
 
   # After pushing a commit
-  git push && bun run .github/workflows-ts/check-pipeline.ts
+  git push && bun run check-pipeline.ts
 `);
   process.exit(0);
 }
 
 // Run the checker
-checkPipeline(noWait)
+checkPipeline(noWait, timeoutSeconds)
   .then(result => {
     process.exit(result.success ? 0 : 1);
   })
