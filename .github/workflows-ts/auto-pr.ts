@@ -3,6 +3,8 @@
 /**
  * Auto PR Workflow
  * Automatically creates a PR for claude/** branches and enables auto-merge
+ *
+ * Tests the git log fix with main branch fetching
  */
 
 import { Logger } from './utils/logger';
