@@ -1,0 +1,9 @@
+{
+  "name": "workflows-ts",
+  "version": "1.0.0",
+  "description": "TypeScript workflows for GitHub Actions",
+  "type": "module",
+  "scripts": {
+    "auto-pr": "bun run auto-pr.ts"
+  }
+}

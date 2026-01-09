@@ -1,7 +1,9 @@
 === Auto PR Workflow Log ===
-Date: Thu Jan  8 21:39:42 UTC 2026
-Commit: cd66bebbbca9892b83d190184dd067499009fb7e
-Ref: refs/heads/claude/add-comprehensive-logging-pNyoR
+Date: Fri Jan  9 06:22:49 UTC 2026
+Commit: e9d089b06635d991ecac45b80a7098109946d18c
+Ref: refs/heads/claude/workflows-typescript-bun-et9yE
 Job: create-pr
 
-Log file: ci-logs/auto-pr-output.log
+Log files:
+  - ci-logs/auto-pr-output.log (main workflow log)
+  - ci-logs/auto-pr-bun-output.log (bun execution output)
