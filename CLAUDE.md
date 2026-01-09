@@ -8,24 +8,29 @@ This document contains mandatory steps and best practices that Claude must follo
 
 **CRITICAL:** After pushing any commit, you MUST verify the pipeline status and check the results.
 
-**Steps to follow:**
-1. After `git push`, wait a moment for the workflow to start
-2. Check the workflow status with:
-   ```bash
-   git pull origin <branch-name>
-   ls -la ci-logs/
-   ```
-3. Read the latest logs to verify success:
-   ```bash
-   # Find the latest log directory (by commit SHA)
-   ls -la ci-logs/
+**Required Method:**
+Always use the `check-pipeline.ts` script to verify pipeline status:
 
-   # Check stdout and stderr
-   cat ci-logs/<commit-sha>/stdout.log
-   cat ci-logs/<commit-sha>/stderr.log
-   ```
-4. If there are errors, fix them immediately before proceeding
-5. Never assume the workflow succeeded - always verify!
+```bash
+# After git push, run the pipeline checker
+bun src/workflows/check-pipeline.ts
+```
+
+The script will automatically:
+- Wait for all workflow runs to complete (or use `--no-wait` to check immediately)
+- Pull the latest logs from the branch
+- Display workflow run summaries with status and conclusion
+- Find and analyze all log files for the current commit
+- Report any errors found in logs
+- Exit with code 0 on success, 1 on failure
+
+**Steps to follow:**
+1. After `git push`, immediately run: `bun src/workflows/check-pipeline.ts`
+2. Review the workflow summary and log analysis
+3. If there are errors, fix them immediately before proceeding
+4. Never assume the workflow succeeded - always verify!
+
+**DO NOT** manually check logs with bash commands - always use the TypeScript script.
 
 ### 2. Use TypeScript Workflows
 
@@ -122,6 +127,7 @@ After pushing changes:
 │   └── workflows/          # TypeScript workflow implementations
 │       ├── auto-pr.ts
 │       ├── build.ts
+│       ├── check-pipeline.ts
 │       ├── cleanup-branches.ts
 │       ├── e2e-local.ts
 │       ├── e2e-deployed.ts
@@ -138,6 +144,17 @@ After pushing changes:
 ```
 
 ## Common Workflows
+
+### Check Pipeline Workflow
+- **File:** `src/workflows/check-pipeline.ts`
+- **Usage:** `bun src/workflows/check-pipeline.ts [--no-wait]`
+- **Purpose:** Verify pipeline status after pushing commits
+- Waits for all workflow runs to complete (unless `--no-wait`)
+- Pulls logs from the branch automatically
+- Displays workflow summaries with status and conclusion
+- Analyzes log files for errors
+- Returns exit code 0 on success, 1 on failure
+- **When to use:** After EVERY `git push`
 
 ### Auto PR Workflow
 - Triggers on: Push to `claude/**` branches
@@ -160,12 +177,16 @@ After pushing changes:
 
 ## Quick Reference
 
-### Check latest pipeline logs
+### Check pipeline status
 ```bash
-git pull origin <branch>
-LATEST=$(ls -t ci-logs/ | head -1)
-cat ci-logs/$LATEST/stdout.log
-cat ci-logs/$LATEST/stderr.log
+# Check pipeline status and wait for completion
+bun src/workflows/check-pipeline.ts
+
+# Quick check without waiting
+bun src/workflows/check-pipeline.ts --no-wait
+
+# After pushing changes
+git push -u origin <branch> && bun src/workflows/check-pipeline.ts
 ```
 
 ### Create new TypeScript workflow
@@ -196,10 +217,12 @@ chmod +x src/workflows/my-workflow.ts
 ## Remember
 
 🔴 **ALWAYS check pipeline status after pushing** - this is non-negotiable!
+🔴 **Use `bun src/workflows/check-pipeline.ts` to verify pipeline status** - never skip this!
 
 ✅ Use TypeScript for all workflow logic
-✅ Use `./run-workflow.sh` for execution
-✅ Check logs in `ci-logs/<commit-sha>/`
+✅ Use `./run-workflow.sh` for execution in CI
+✅ Use `bun src/workflows/check-pipeline.ts` after every push
+✅ Check logs automatically with check-pipeline.ts
 ✅ Make files executable with `chmod +x`
 ✅ Follow git best practices
 ✅ Fail fast, fix immediately

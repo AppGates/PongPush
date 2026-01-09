@@ -76,7 +76,7 @@ async function getWorkflowRuns(branch: string, sha: string): Promise<WorkflowRun
   }
 }
 
-async function waitForCompletion(branch: string, sha: string, timeoutSeconds = 300, skipWait = false): Promise<WorkflowRun[]> {
+async function waitForCompletion(branch: string, sha: string, timeoutSeconds = 60, skipWait = false): Promise<WorkflowRun[]> {
   const startTime = Date.now();
   const pollInterval = 5000; // 5 seconds
 
@@ -275,7 +275,7 @@ async function checkPipeline(skipWait = false): Promise<CheckResult> {
     const sha = await getLatestCommitSha();
 
     // Wait for workflows to complete (or just check once)
-    const runs = await waitForCompletion(branch, sha, 300, skipWait);
+    const runs = await waitForCompletion(branch, sha, 60, skipWait);
 
     // Display run summary if we have runs
     if (runs.length > 0) {
