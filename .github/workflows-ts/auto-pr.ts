@@ -131,6 +131,10 @@ async function main() {
     }, logger);
     logger.info('');
 
+    // Initialize clients (needed for cleanup and PR operations)
+    const github = new GitHubClient(ctx.token, ctx.repository, logger);
+    const git = new GitClient(logger);
+
     // Clean up stale branches (branches with no commits ahead of main)
     logger.section('Cleaning Up Stale Branches');
     await cleanupStaleBranches(ctx, git, github, logger);
@@ -140,10 +144,6 @@ async function main() {
     logger.info(`Branch: ${ctx.branch}`);
     logger.info(`Ref: ${ctx.ref}`);
     logger.info('');
-
-    // Initialize clients
-    const github = new GitHubClient(ctx.token, ctx.repository, logger);
-    const git = new GitClient(logger);
 
     // Check repository settings
     logger.section('Checking Repository Settings');
