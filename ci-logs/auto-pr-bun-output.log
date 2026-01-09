@@ -1,0 +1,56 @@
+📝 
+📝 ================================
+📝 === Auto PR Workflow Started ===
+📝 ================================
+📝 
+📝 Timestamp: 2026-01-09T06:19:08.280Z
+📝 Commit: 05fdb642ea54a10972fe95b62b1dc0b191733d68
+📝 
+📝 
+📝 ==========================
+📝 === Branch Information ===
+📝 ==========================
+📝 
+📝 Branch: claude/workflows-typescript-bun-et9yE
+📝 Ref: refs/heads/claude/workflows-typescript-bun-et9yE
+📝 
+📝 
+📝 ====================================
+📝 === Checking Repository Settings ===
+📝 ====================================
+📝 
+🔍 Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+📝 Auto-merge allowed: true
+📝 Merge commit allowed: true
+📝 Squash merge allowed: true
+📝 Rebase merge allowed: true
+📝 
+📝 
+📝 ================================
+📝 === Checking for Existing PR ===
+📝 ================================
+📝 
+❌ Failed to check for existing PR: ShellError: Failed with exit code 1
+📝 No existing PR found. Creating new PR...
+🔍 Latest commit message: Fix: Ensure bun output is captured and logs are always pushed
+📝 Commit message: Fix: Ensure bun output is captured and logs are always pushed
+❌ Failed to get commit log: ShellError: Failed with exit code 128
+📝 
+📝 --- Creating PR ---
+📝 Creating PR: "Fix: Ensure bun output is captured and logs are always pushed"
+🔍 Base: main, Head: claude/workflows-typescript-bun-et9yE
+❌ Failed to create PR: ShellError: Failed with exit code 1
+❌ Failed to create PR
+📝 Attempting to find PR another way...
+❌ Failed to check for existing PR: ShellError: Failed with exit code 1
+❌ Could not find or create PR. Workflow cannot continue.
+📝 
+📝 =======================================
+📝 === Workflow Complete (with errors) ===
+📝 =======================================
+📝 

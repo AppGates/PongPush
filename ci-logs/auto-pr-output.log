@@ -1,15 +1,42 @@
-=== Auto PR Workflow Started ===
-Timestamp: Thu Jan  8 21:39:40 UTC 2026
-Commit: cd66bebbbca9892b83d190184dd067499009fb7e
+2026-01-09T06:19:08.280Z INFO    [AutoPR] 
+2026-01-09T06:19:08.280Z INFO    [AutoPR] ====================================
+2026-01-09T06:19:08.280Z INFO    [AutoPR] === Checking Repository Settings ===
+2026-01-09T06:19:08.281Z INFO    [AutoPR] ====================================
+2026-01-09T06:19:08.281Z INFO    [AutoPR] 
+2026-01-09T06:19:10.642Z DEBUG   [AutoPR:GitHub] Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+2026-01-09T06:19:10.642Z INFO    [AutoPR] Auto-merge allowed: true
+2026-01-09T06:19:10.642Z INFO    [AutoPR] Merge commit allowed: true
+2026-01-09T06:19:10.642Z INFO    [AutoPR] Squash merge allowed: true
+2026-01-09T06:19:10.642Z INFO    [AutoPR] Rebase merge allowed: true
+2026-01-09T06:19:10.642Z INFO    [AutoPR] 
+2026-01-09T06:19:10.642Z INFO    [AutoPR] 
+2026-01-09T06:19:10.642Z INFO    [AutoPR] ================================
+2026-01-09T06:19:10.642Z INFO    [AutoPR] === Checking for Existing PR ===
+2026-01-09T06:19:10.642Z INFO    [AutoPR] ================================
+2026-01-09T06:19:10.642Z INFO    [AutoPR] 
+2026-01-09T06:19:10.706Z ERROR   [AutoPR:GitHub] Failed to check for existing PR: ShellError: Failed with exit code 1
+2026-01-09T06:19:10.706Z INFO    [AutoPR] No existing PR found. Creating new PR...
+2026-01-09T06:19:10.720Z DEBUG   [AutoPR:Git] Latest commit message: Fix: Ensure bun output is captured and logs are always pushed
+2026-01-09T06:19:10.720Z INFO    [AutoPR] Commit message: Fix: Ensure bun output is captured and logs are always pushed
+2026-01-09T06:19:10.733Z ERROR   [AutoPR:Git] Failed to get commit log: ShellError: Failed with exit code 128
+2026-01-09T06:19:10.733Z INFO    [AutoPR] 
+2026-01-09T06:19:10.733Z INFO    [AutoPR] --- Creating PR ---
+2026-01-09T06:19:10.733Z INFO    [AutoPR:GitHub] Creating PR: "Fix: Ensure bun output is captured and logs are always pushed"
+2026-01-09T06:19:10.733Z DEBUG   [AutoPR:GitHub] Base: main, Head: claude/workflows-typescript-bun-et9yE
+2026-01-09T06:19:10.793Z ERROR   [AutoPR:GitHub] Failed to create PR: ShellError: Failed with exit code 1
+2026-01-09T06:19:10.794Z ERROR   [AutoPR] Failed to create PR
+2026-01-09T06:19:10.794Z INFO    [AutoPR] Attempting to find PR another way...
+2026-01-09T06:19:10.852Z ERROR   [AutoPR:GitHub] Failed to check for existing PR: ShellError: Failed with exit code 1
+2026-01-09T06:19:10.852Z ERROR   [AutoPR] Could not find or create PR. Workflow cannot continue.
+2026-01-09T06:19:10.852Z INFO    [AutoPR] 
+2026-01-09T06:19:10.852Z INFO    [AutoPR] =======================================
+2026-01-09T06:19:10.852Z INFO    [AutoPR] === Workflow Complete (with errors) ===
+2026-01-09T06:19:10.852Z INFO    [AutoPR] =======================================
+2026-01-09T06:19:10.852Z INFO    [AutoPR] 
 
-=== Branch Information ===
-Branch: claude/add-comprehensive-logging-pNyoR
-Ref: refs/heads/claude/add-comprehensive-logging-pNyoR
-
-=== Checking Repository Settings ===
-{"allow_auto_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_squash_merge":true}
-
-=== Checking for Existing PR ===
-
-No existing PR found. Creating new PR...
-Commit message: Fix: Improve error handling in auto-PR workflow
+=== Bun Execution Complete (Success) ===
