@@ -3,8 +3,8 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T06:22:43.140Z
-📝 Commit: e9d089b06635d991ecac45b80a7098109946d18c
+📝 Timestamp: 2026-01-09T06:26:40.939Z
+📝 Commit: 2401b0d497e7d24c0db5a969cfdeeefa7e85192c
 📝 
 📝 
 📝 ==========================
@@ -19,6 +19,7 @@
 📝 === Checking Repository Settings ===
 📝 ====================================
 📝 
+🔍 Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
 🔍 Repository settings: {
   "allow_auto_merge": true,
   "allow_merge_commit": true,
@@ -35,33 +36,12 @@
 📝 === Checking for Existing PR ===
 📝 ================================
 📝 
-📝 No existing PR found for branch claude/workflows-typescript-bun-et9yE
-📝 No existing PR found. Creating new PR...
-🔍 Latest commit message: Fix: Use Bun.spawn for gh CLI to properly capture stderr
-📝 Commit message: Fix: Use Bun.spawn for gh CLI to properly capture stderr
-❌ Failed to get commit log: ShellError: Failed with exit code 128
+🔍 Running: gh pr list --head claude/workflows-typescript-bun-et9yE --json number --jq .[0].number
+📝 Found existing PR #5 for branch claude/workflows-typescript-bun-et9yE
+📝 PR #5 already exists for branch claude/workflows-typescript-bun-et9yE
 📝 
-📝 --- Creating PR ---
-📝 Creating PR: "Fix: Use Bun.spawn for gh CLI to properly capture stderr"
-🔍 Base: main, Head: claude/workflows-typescript-bun-et9yE
-✅ PR created: https://github.com/AppGates/PongPush/pull/5
-✅ PR created: https://github.com/AppGates/PongPush/pull/5
-📝 PR Number: 5
-📝 
-📝 ===========================
-📝 === Enabling Auto-Merge ===
-📝 ===========================
-📝 
-📝 Attempting to enable auto-merge for PR #5...
-📝 Enabling auto-merge for PR #5 with method: merge
-⚠️ gh pr merge --auto failed with exit code 1
-⚠️ stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
-⚠️ Auto-merge command failed
-📝 
-📝 =======================
-📝 === Final PR Status ===
-📝 =======================
-📝 
+📝 --- Existing PR Details ---
+🔍 Running: gh pr view 5 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
 🔍 PR #5 details: {
   "autoMergeRequest": null,
   "mergeStateStatus": "UNSTABLE",
@@ -73,9 +53,9 @@
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843260174/job/59881596425",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339420/job/59881812137",
       "name": "create-pr",
-      "startedAt": "2026-01-09T06:22:39Z",
+      "startedAt": "2026-01-09T06:26:35Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
     },
@@ -83,9 +63,9 @@
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843260166/job/59881596446",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339419/job/59881812156",
       "name": "build",
-      "startedAt": "2026-01-09T06:22:39Z",
+      "startedAt": "2026-01-09T06:26:36Z",
       "status": "IN_PROGRESS",
       "workflowName": "CI/CD Pipeline"
     }
@@ -96,6 +76,57 @@
 📝 State: OPEN
 📝 Mergeable: MERGEABLE
 📝 Merge state: UNSTABLE
+📝 Auto-merge: disabled
+📝 
+📝 ===========================
+📝 === Enabling Auto-Merge ===
+📝 ===========================
+📝 
+📝 Attempting to enable auto-merge for PR #5...
+📝 Enabling auto-merge for PR #5 with method: merge
+🔍 Running: gh pr merge 5 --auto --merge
+✅ Auto-merge enabled successfully for PR #5
+✅ Auto-merge enabled successfully
+📝 
+📝 =======================
+📝 === Final PR Status ===
+📝 =======================
+📝 
+🔍 Running: gh pr view 5 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #5 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNKNOWN",
+  "mergeable": "UNKNOWN",
+  "number": 5,
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339420/job/59881812137",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T06:26:35Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843339419/job/59881812156",
+      "name": "build",
+      "startedAt": "2026-01-09T06:26:36Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Fix: Use Bun.spawn for gh CLI to properly capture stderr"
+}
+📝 Title: Fix: Use Bun.spawn for gh CLI to properly capture stderr
+📝 State: MERGED
+📝 Mergeable: UNKNOWN
+📝 Merge state: UNKNOWN
 📝 Auto-merge: disabled
 📝 
 📝 --- Status Checks ---
