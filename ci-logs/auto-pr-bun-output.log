@@ -3,8 +3,8 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T06:32:09.522Z
-📝 Commit: 7e43b968d234ff0d3da94ef3f367eb49a69e1ac4
+📝 Timestamp: 2026-01-09T06:37:37.530Z
+📝 Commit: e7909652662fae5af7b9f73d192c14c38dc2699b
 📝 
 📝 
 📝 ==========================
@@ -40,8 +40,8 @@
 📝 No existing PR found for branch claude/workflows-typescript-bun-et9yE
 📝 No existing PR found. Creating new PR...
 🔍 Running: git log -1 --pretty=%s
-🔍 Latest commit message: Docs: Add comprehensive workflow development guide
-📝 Commit message: Docs: Add comprehensive workflow development guide
+🔍 Latest commit message: Docs: Update CLAUDE.md with pipeline checker usage
+📝 Commit message: Docs: Update CLAUDE.md with pipeline checker usage
 🔍 Running: git log main..HEAD --oneline
 🔍 stderr: fatal: ambiguous argument 'main..HEAD': unknown revision or path not in the working tree.
 Use '--' to separate paths from revisions, like this:
@@ -51,9 +51,9 @@ Use '--' to separate paths from revisions, like this:
 'git <command> [<revision>...] -- [<file>...]'
 📝 
 📝 --- Creating PR ---
-📝 Creating PR: "Docs: Add comprehensive workflow development guide"
+📝 Creating PR: "Docs: Update CLAUDE.md with pipeline checker usage"
 🔍 Base: main, Head: claude/workflows-typescript-bun-et9yE
-🔍 Running: gh pr create --title Docs: Add comprehensive workflow development guide --body ## Automated PR
+🔍 Running: gh pr create --title Docs: Update CLAUDE.md with pipeline checker usage --body ## Automated PR
 
 This PR was automatically created from a claude/** branch.
 
@@ -61,39 +61,41 @@ This PR was automatically created from a claude/** branch.
 
 ---
 **Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/workflows-typescript-bun-et9yE
-✅ PR created: https://github.com/AppGates/PongPush/pull/6
-✅ PR created: https://github.com/AppGates/PongPush/pull/6
-📝 PR Number: 6
+✅ PR created: https://github.com/AppGates/PongPush/pull/7
+✅ PR created: https://github.com/AppGates/PongPush/pull/7
+📝 PR Number: 7
 📝 
 📝 ===========================
 📝 === Enabling Auto-Merge ===
 📝 ===========================
 📝 
-📝 Attempting to enable auto-merge for PR #6...
-📝 Enabling auto-merge for PR #6 with method: merge
-🔍 Running: gh pr merge 6 --auto --merge
-✅ Auto-merge enabled successfully for PR #6
-✅ Auto-merge enabled successfully
+📝 Attempting to enable auto-merge for PR #7...
+📝 Enabling auto-merge for PR #7 with method: merge
+🔍 Running: gh pr merge 7 --auto --merge
+🔍 stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+⚠️ gh pr merge --auto failed with exit code 1
+⚠️ stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+⚠️ Auto-merge command failed
 📝 
 📝 =======================
 📝 === Final PR Status ===
 📝 =======================
 📝 
-🔍 Running: gh pr view 6 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #6 details: {
+🔍 Running: gh pr view 7 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #7 details: {
   "autoMergeRequest": null,
-  "mergeStateStatus": "UNKNOWN",
-  "mergeable": "UNKNOWN",
-  "number": 6,
-  "state": "MERGED",
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 7,
+  "state": "OPEN",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843448903/job/59882115444",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843554811/job/59882402052",
       "name": "create-pr",
-      "startedAt": "2026-01-09T06:32:04Z",
+      "startedAt": "2026-01-09T06:37:32Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
     },
@@ -101,19 +103,19 @@ This PR was automatically created from a claude/** branch.
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843448922/job/59882115519",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20843554814/job/59882402041",
       "name": "build",
-      "startedAt": "2026-01-09T06:32:05Z",
+      "startedAt": "2026-01-09T06:37:32Z",
       "status": "IN_PROGRESS",
       "workflowName": "CI/CD Pipeline"
     }
   ],
-  "title": "Docs: Add comprehensive workflow development guide"
+  "title": "Docs: Update CLAUDE.md with pipeline checker usage"
 }
-📝 Title: Docs: Add comprehensive workflow development guide
-📝 State: MERGED
-📝 Mergeable: UNKNOWN
-📝 Merge state: UNKNOWN
+📝 Title: Docs: Update CLAUDE.md with pipeline checker usage
+📝 State: OPEN
+📝 Mergeable: MERGEABLE
+📝 Merge state: UNSTABLE
 📝 Auto-merge: disabled
 📝 
 📝 --- Status Checks ---
