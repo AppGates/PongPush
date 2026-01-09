@@ -239,4 +239,56 @@ export class GitClient {
 
     return false;
   }
+
+  /**
+   * Check if a branch has commits ahead of another branch
+   * Returns true if there are commits in head that are not in base
+   */
+  async hasCommitsAhead(baseBranch: string, headBranch: string = 'HEAD'): Promise<boolean> {
+    try {
+      this.logger.debug(`Checking if ${headBranch} has commits ahead of ${baseBranch}`);
+
+      const result = await spawnGitCommand(
+        ['rev-list', '--count', `${baseBranch}..${headBranch}`],
+        this.logger
+      );
+
+      if (!result.success) {
+        this.logger.error(`Failed to check commits ahead: ${result.stderr}`);
+        return false;
+      }
+
+      const count = parseInt(result.stdout, 10);
+      this.logger.debug(`Found ${count} commit(s) ahead`);
+      return count > 0;
+    } catch (error) {
+      this.logger.error(`Failed to check commits ahead: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * Delete a remote branch
+   */
+  async deleteBranch(remote: string, branch: string): Promise<boolean> {
+    try {
+      this.logger.info(`Deleting branch ${branch} from ${remote}`);
+
+      const result = await spawnGitCommand(
+        ['push', remote, '--delete', branch],
+        this.logger
+      );
+
+      if (!result.success) {
+        this.logger.error(`Failed to delete branch: ${result.stderr}`);
+        return false;
+      }
+
+      this.logger.success(`Successfully deleted branch ${branch} from ${remote}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to delete branch: ${error}`);
+      return false;
+    }
+  }
 }

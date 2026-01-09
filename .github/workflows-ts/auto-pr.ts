@@ -85,6 +85,42 @@ async function main() {
     }
     logger.info('');
 
+    // Check if branch has commits ahead of main
+    logger.section('Checking Branch Status');
+    await git.fetch('origin', 'main');
+    const hasCommits = await git.hasCommitsAhead('origin/main', 'HEAD');
+
+    if (!hasCommits) {
+      logger.warn('Branch has no commits ahead of main');
+
+      // Check if there's a merged PR to clean up
+      const prNumber = await github.findPullRequest(ctx.branch);
+      if (prNumber) {
+        const prDetails = await github.getPullRequestDetails(prNumber);
+        if (prDetails && prDetails.state === 'MERGED') {
+          logger.info(`PR #${prNumber} is already merged, deleting branch`);
+        } else {
+          logger.info('Branch is up-to-date with main, deleting branch');
+        }
+      } else {
+        logger.info('No commits to create PR, deleting branch');
+      }
+
+      // Delete the branch
+      const deleted = await git.deleteBranch('origin', ctx.branch);
+      if (deleted) {
+        logger.success('Branch deleted successfully');
+      } else {
+        logger.warn('Branch deletion failed, but continuing');
+      }
+
+      logger.section('Workflow Complete');
+      process.exit(0);
+    }
+
+    logger.info(`Branch has commits ahead of main`);
+    logger.info('');
+
     // Check if PR already exists
     logger.section('Checking for Existing PR');
     let prNumber = await github.findPullRequest(ctx.branch);
@@ -101,6 +137,20 @@ async function main() {
         logger.info(`Mergeable: ${prDetails.mergeable}`);
         logger.info(`Merge state: ${prDetails.mergeStateStatus}`);
         logger.info(`Auto-merge: ${prDetails.autoMergeRequest ? 'enabled' : 'disabled'}`);
+
+        // If PR is merged, delete the branch
+        if (prDetails.state === 'MERGED') {
+          logger.info('');
+          logger.subsection('Cleaning Up Merged Branch');
+          const deleted = await git.deleteBranch('origin', ctx.branch);
+          if (deleted) {
+            logger.success('Merged branch deleted successfully');
+          } else {
+            logger.warn('Branch deletion failed');
+          }
+          logger.section('Workflow Complete');
+          process.exit(0);
+        }
       }
     } else {
       logger.info('No existing PR found. Creating new PR...');
@@ -109,9 +159,7 @@ async function main() {
       const commitMsg = await git.getLatestCommitMessage();
       logger.info(`Commit message: ${commitMsg}`);
 
-      // Get commit log for PR body (fetch main branch first to make it available)
-      logger.debug('Fetching main branch for commit comparison...');
-      await git.fetch('origin', 'main');
+      // Get commit log for PR body (main branch already fetched)
       const commitLog = await git.getCommitLog('origin/main', 'HEAD', 'oneline');
 
       // Create PR body
