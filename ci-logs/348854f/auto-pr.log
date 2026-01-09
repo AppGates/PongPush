@@ -1,0 +1,138 @@
+2026-01-09T20:46:51.112Z INFO    [AutoPR] 
+2026-01-09T20:46:51.112Z INFO    [AutoPR] ==================================
+2026-01-09T20:46:51.112Z INFO    [AutoPR] === Cleaning Up Stale Branches ===
+2026-01-09T20:46:51.112Z INFO    [AutoPR] ==================================
+2026-01-09T20:46:51.112Z INFO    [AutoPR] 
+2026-01-09T20:46:51.440Z INFO    [AutoPR] Found 4 claude branches to check
+2026-01-09T20:46:51.440Z INFO    [AutoPR] Checking 3 other branches for cleanup
+2026-01-09T20:46:51.440Z DEBUG   [AutoPR:Git] Checking if origin/claude/gitlab-api-github-action-z2DOZ has commits ahead of origin/main
+2026-01-09T20:46:51.440Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/gitlab-api-github-action-z2DOZ
+2026-01-09T20:46:51.454Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T20:46:51.454Z DEBUG   [AutoPR]   ✅ claude/gitlab-api-github-action-z2DOZ: has commits, keeping
+2026-01-09T20:46:51.454Z DEBUG   [AutoPR:Git] Checking if origin/claude/test-git-log-fix-et9yE has commits ahead of origin/main
+2026-01-09T20:46:51.455Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/test-git-log-fix-et9yE
+2026-01-09T20:46:51.468Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T20:46:51.468Z DEBUG   [AutoPR]   ✅ claude/test-git-log-fix-et9yE: has commits, keeping
+2026-01-09T20:46:51.468Z DEBUG   [AutoPR:Git] Checking if origin/claude/workflows-typescript-bun-et9yE has commits ahead of origin/main
+2026-01-09T20:46:51.469Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..origin/claude/workflows-typescript-bun-et9yE
+2026-01-09T20:46:51.482Z DEBUG   [AutoPR:Git] Found 1 commit(s) ahead
+2026-01-09T20:46:51.482Z DEBUG   [AutoPR]   ✅ claude/workflows-typescript-bun-et9yE: has commits, keeping
+2026-01-09T20:46:51.482Z INFO    [AutoPR] Cleanup complete: 0 deleted, 3 kept
+2026-01-09T20:46:51.482Z INFO    [AutoPR] 
+2026-01-09T20:46:51.482Z INFO    [AutoPR] 
+2026-01-09T20:46:51.482Z INFO    [AutoPR] ==========================
+2026-01-09T20:46:51.482Z INFO    [AutoPR] === Branch Information ===
+2026-01-09T20:46:51.482Z INFO    [AutoPR] ==========================
+2026-01-09T20:46:51.482Z INFO    [AutoPR] 
+2026-01-09T20:46:51.482Z INFO    [AutoPR] Branch: claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:46:51.482Z INFO    [AutoPR] Ref: refs/heads/claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:46:51.482Z INFO    [AutoPR] 
+2026-01-09T20:46:51.482Z INFO    [AutoPR] 
+2026-01-09T20:46:51.482Z INFO    [AutoPR] ====================================
+2026-01-09T20:46:51.482Z INFO    [AutoPR] === Checking Repository Settings ===
+2026-01-09T20:46:51.482Z INFO    [AutoPR] ====================================
+2026-01-09T20:46:51.482Z INFO    [AutoPR] 
+2026-01-09T20:46:51.483Z DEBUG   [AutoPR:GitHub] Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+2026-01-09T20:46:54.139Z DEBUG   [AutoPR:GitHub] Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+2026-01-09T20:46:54.139Z INFO    [AutoPR] Auto-merge allowed: true
+2026-01-09T20:46:54.139Z INFO    [AutoPR] Merge commit allowed: true
+2026-01-09T20:46:54.139Z INFO    [AutoPR] Squash merge allowed: true
+2026-01-09T20:46:54.139Z INFO    [AutoPR] Rebase merge allowed: true
+2026-01-09T20:46:54.139Z INFO    [AutoPR] 
+2026-01-09T20:46:54.139Z INFO    [AutoPR] 
+2026-01-09T20:46:54.139Z INFO    [AutoPR] ==============================
+2026-01-09T20:46:54.139Z INFO    [AutoPR] === Checking Branch Status ===
+2026-01-09T20:46:54.139Z INFO    [AutoPR] ==============================
+2026-01-09T20:46:54.139Z INFO    [AutoPR] 
+2026-01-09T20:46:54.140Z INFO    [AutoPR:Git] Fetching from origin main (attempt 1/5)
+2026-01-09T20:46:54.140Z DEBUG   [AutoPR:Git] Running: git fetch origin main
+2026-01-09T20:46:54.479Z SUCCESS [AutoPR:Git] Successfully fetched from origin
+2026-01-09T20:46:54.479Z DEBUG   [AutoPR:Git] Checking if HEAD has commits ahead of origin/main
+2026-01-09T20:46:54.479Z DEBUG   [AutoPR:Git] Running: git rev-list --count origin/main..HEAD
+2026-01-09T20:46:54.493Z DEBUG   [AutoPR:Git] Found 2 commit(s) ahead
+2026-01-09T20:46:54.493Z INFO    [AutoPR] Branch has commits ahead of main
+2026-01-09T20:46:54.493Z INFO    [AutoPR] 
+2026-01-09T20:46:54.493Z INFO    [AutoPR] 
+2026-01-09T20:46:54.493Z INFO    [AutoPR] ================================
+2026-01-09T20:46:54.493Z INFO    [AutoPR] === Checking for Existing PR ===
+2026-01-09T20:46:54.493Z INFO    [AutoPR] ================================
+2026-01-09T20:46:54.493Z INFO    [AutoPR] 
+2026-01-09T20:46:54.493Z DEBUG   [AutoPR:GitHub] Running: gh pr list --head claude/simplify-pr-workflow-fSFY4 --json number --jq .[0].number
+2026-01-09T20:46:54.816Z INFO    [AutoPR:GitHub] No existing PR found for branch claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:46:54.816Z INFO    [AutoPR] No existing PR found. Creating new PR...
+2026-01-09T20:46:54.816Z DEBUG   [AutoPR:Git] Running: git log -1 --pretty=%s
+2026-01-09T20:46:54.830Z DEBUG   [AutoPR:Git] Latest commit message: Simplify: pass only workflow filename, auto-prepend src/workflows/
+2026-01-09T20:46:54.830Z INFO    [AutoPR] Commit message: Simplify: pass only workflow filename, auto-prepend src/workflows/
+2026-01-09T20:46:54.830Z DEBUG   [AutoPR:Git] Running: git log origin/main..HEAD --oneline
+2026-01-09T20:46:54.844Z INFO    [AutoPR] 
+2026-01-09T20:46:54.844Z INFO    [AutoPR] --- Creating PR ---
+2026-01-09T20:46:54.844Z INFO    [AutoPR:GitHub] Creating PR: "Simplify: pass only workflow filename, auto-prepend src/workflows/"
+2026-01-09T20:46:54.844Z DEBUG   [AutoPR:GitHub] Base: main, Head: claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:46:54.844Z DEBUG   [AutoPR:GitHub] Running: gh pr create --title Simplify: pass only workflow filename, auto-prepend src/workflows/ --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+348854f Simplify: pass only workflow filename, auto-prepend src/workflows/
+e44d1e5 CI: Add auto-PR logs for b7e925fca8e91062914fb91ea2a2e587618e1dc0
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/simplify-pr-workflow-fSFY4
+2026-01-09T20:46:56.628Z SUCCESS [AutoPR:GitHub] PR created: https://github.com/AppGates/PongPush/pull/15
+2026-01-09T20:46:56.628Z SUCCESS [AutoPR] PR created: https://github.com/AppGates/PongPush/pull/15
+2026-01-09T20:46:56.628Z INFO    [AutoPR] PR Number: 15
+2026-01-09T20:46:56.629Z INFO    [AutoPR] 
+2026-01-09T20:46:56.629Z INFO    [AutoPR] ===========================
+2026-01-09T20:46:56.629Z INFO    [AutoPR] === Enabling Auto-Merge ===
+2026-01-09T20:46:56.629Z INFO    [AutoPR] ===========================
+2026-01-09T20:46:56.629Z INFO    [AutoPR] 
+2026-01-09T20:46:56.629Z INFO    [AutoPR] Attempting to enable auto-merge for PR #15...
+2026-01-09T20:46:56.629Z INFO    [AutoPR:GitHub] Enabling auto-merge for PR #15 with method: merge
+2026-01-09T20:46:56.629Z DEBUG   [AutoPR:GitHub] Running: gh pr merge 15 --auto --merge
+2026-01-09T20:46:59.049Z SUCCESS [AutoPR:GitHub] Auto-merge enabled successfully for PR #15
+2026-01-09T20:46:59.049Z SUCCESS [AutoPR] Auto-merge enabled successfully
+2026-01-09T20:46:59.049Z INFO    [AutoPR] 
+2026-01-09T20:46:59.049Z INFO    [AutoPR] =======================
+2026-01-09T20:46:59.049Z INFO    [AutoPR] === Final PR Status ===
+2026-01-09T20:46:59.049Z INFO    [AutoPR] =======================
+2026-01-09T20:46:59.049Z INFO    [AutoPR] 
+2026-01-09T20:46:59.049Z DEBUG   [AutoPR:GitHub] Running: gh pr view 15 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+2026-01-09T20:46:59.481Z DEBUG   [AutoPR:GitHub] PR #15 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNKNOWN",
+  "mergeable": "UNKNOWN",
+  "number": 15,
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865087613/job/59954109942",
+      "name": "create-pr",
+      "startedAt": "2026-01-09T20:46:45Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    }
+  ],
+  "title": "Simplify: pass only workflow filename, auto-prepend src/workflows/"
+}
+2026-01-09T20:46:59.481Z INFO    [AutoPR] Title: Simplify: pass only workflow filename, auto-prepend src/workflows/
+2026-01-09T20:46:59.481Z INFO    [AutoPR] State: MERGED
+2026-01-09T20:46:59.481Z INFO    [AutoPR] Mergeable: UNKNOWN
+2026-01-09T20:46:59.481Z INFO    [AutoPR] Merge state: UNKNOWN
+2026-01-09T20:46:59.481Z INFO    [AutoPR] Auto-merge: disabled
+2026-01-09T20:46:59.481Z INFO    [AutoPR] 
+2026-01-09T20:46:59.481Z INFO    [AutoPR] --- Status Checks ---
+2026-01-09T20:46:59.481Z INFO    [AutoPR]   - create-pr: IN_PROGRESS
+2026-01-09T20:46:59.481Z INFO    [AutoPR] 
+2026-01-09T20:46:59.481Z INFO    [AutoPR] 
+2026-01-09T20:46:59.481Z INFO    [AutoPR] =========================
+2026-01-09T20:46:59.481Z INFO    [AutoPR] === Workflow Complete ===
+2026-01-09T20:46:59.481Z INFO    [AutoPR] =========================
+2026-01-09T20:46:59.481Z INFO    [AutoPR] 

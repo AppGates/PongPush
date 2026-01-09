@@ -3,17 +3,17 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T20:45:11.376Z
-📝 Commit: b7e925fca8e91062914fb91ea2a2e587618e1dc0
+📝 Timestamp: 2026-01-09T20:46:51.111Z
+📝 Commit: 348854f578ab116b4e6cbb253036a86c0231286d
 📝 
 📝 
 📝 --- Cleaning Up Old Logs ---
 📝 Log directory: ci-logs
-📝 Current commit: b7e925f
+📝 Current commit: 348854f
 📝 Dry run: no
 📝 Found 2 log directory(ies)
-🔍 Deleting: 5ffbabc
-🔍 Preserving: b7e925f (current commit)
+🔍 Deleting: b7e925f
+🔍 Preserving: 348854f (current commit)
 📝 Cleanup complete: 1 deleted, 1 preserved
 📝 
 📝 
@@ -72,7 +72,7 @@
 ✅ Successfully fetched from origin
 🔍 Checking if HEAD has commits ahead of origin/main
 🔍 Running: git rev-list --count origin/main..HEAD
-🔍 Found 4 commit(s) ahead
+🔍 Found 2 commit(s) ahead
 📝 Branch has commits ahead of main
 📝 
 📝 
@@ -81,93 +81,66 @@
 📝 ================================
 📝 
 🔍 Running: gh pr list --head claude/simplify-pr-workflow-fSFY4 --json number --jq .[0].number
-📝 Found existing PR #14 for branch claude/simplify-pr-workflow-fSFY4
-📝 PR #14 already exists for branch claude/simplify-pr-workflow-fSFY4
+📝 No existing PR found for branch claude/simplify-pr-workflow-fSFY4
+📝 No existing PR found. Creating new PR...
+🔍 Running: git log -1 --pretty=%s
+🔍 Latest commit message: Simplify: pass only workflow filename, auto-prepend src/workflows/
+📝 Commit message: Simplify: pass only workflow filename, auto-prepend src/workflows/
+🔍 Running: git log origin/main..HEAD --oneline
 📝 
-📝 --- Existing PR Details ---
-🔍 Running: gh pr view 14 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #14 details: {
-  "autoMergeRequest": null,
-  "mergeStateStatus": "UNSTABLE",
-  "mergeable": "MERGEABLE",
-  "number": 14,
-  "state": "OPEN",
-  "statusCheckRollup": [
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865047143/job/59953976002",
-      "name": "create-pr",
-      "startedAt": "2026-01-09T20:45:07Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "Auto Create PR"
-    },
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865047166/job/59953976214",
-      "name": "build",
-      "startedAt": "2026-01-09T20:45:07Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "CI/CD Pipeline"
-    }
-  ],
-  "title": "Remove || true from bun command - workflow should fail on errors"
-}
-📝 Title: Remove || true from bun command - workflow should fail on errors
-📝 State: OPEN
-📝 Mergeable: MERGEABLE
-📝 Merge state: UNSTABLE
-📝 Auto-merge: disabled
+📝 --- Creating PR ---
+📝 Creating PR: "Simplify: pass only workflow filename, auto-prepend src/workflows/"
+🔍 Base: main, Head: claude/simplify-pr-workflow-fSFY4
+🔍 Running: gh pr create --title Simplify: pass only workflow filename, auto-prepend src/workflows/ --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+348854f Simplify: pass only workflow filename, auto-prepend src/workflows/
+e44d1e5 CI: Add auto-PR logs for b7e925fca8e91062914fb91ea2a2e587618e1dc0
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/simplify-pr-workflow-fSFY4
+✅ PR created: https://github.com/AppGates/PongPush/pull/15
+✅ PR created: https://github.com/AppGates/PongPush/pull/15
+📝 PR Number: 15
 📝 
 📝 ===========================
 📝 === Enabling Auto-Merge ===
 📝 ===========================
 📝 
-📝 Attempting to enable auto-merge for PR #14...
-📝 Enabling auto-merge for PR #14 with method: merge
-🔍 Running: gh pr merge 14 --auto --merge
-✅ Auto-merge enabled successfully for PR #14
+📝 Attempting to enable auto-merge for PR #15...
+📝 Enabling auto-merge for PR #15 with method: merge
+🔍 Running: gh pr merge 15 --auto --merge
+✅ Auto-merge enabled successfully for PR #15
 ✅ Auto-merge enabled successfully
 📝 
 📝 =======================
 📝 === Final PR Status ===
 📝 =======================
 📝 
-🔍 Running: gh pr view 14 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #14 details: {
+🔍 Running: gh pr view 15 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #15 details: {
   "autoMergeRequest": null,
   "mergeStateStatus": "UNKNOWN",
   "mergeable": "UNKNOWN",
-  "number": 14,
+  "number": 15,
   "state": "MERGED",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865047143/job/59953976002",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865087613/job/59954109942",
       "name": "create-pr",
-      "startedAt": "2026-01-09T20:45:07Z",
+      "startedAt": "2026-01-09T20:46:45Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
-    },
-    {
-      "__typename": "CheckRun",
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20865047166/job/59953976214",
-      "name": "build",
-      "startedAt": "2026-01-09T20:45:07Z",
-      "status": "IN_PROGRESS",
-      "workflowName": "CI/CD Pipeline"
     }
   ],
-  "title": "Remove || true from bun command - workflow should fail on errors"
+  "title": "Simplify: pass only workflow filename, auto-prepend src/workflows/"
 }
-📝 Title: Remove || true from bun command - workflow should fail on errors
+📝 Title: Simplify: pass only workflow filename, auto-prepend src/workflows/
 📝 State: MERGED
 📝 Mergeable: UNKNOWN
 📝 Merge state: UNKNOWN
@@ -175,7 +148,6 @@
 📝 
 📝 --- Status Checks ---
 📝   - create-pr: IN_PROGRESS
-📝   - build: IN_PROGRESS
 📝 
 📝 
 📝 =========================
