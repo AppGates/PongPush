@@ -2,6 +2,7 @@
 
 import { execSync } from "child_process";
 import { writeFileSync, mkdirSync, existsSync, cpSync } from "fs";
+import { Logger } from "./utils/logger";
 
 /**
  * E2E Local Testing workflow
@@ -15,36 +16,37 @@ import { writeFileSync, mkdirSync, existsSync, cpSync } from "fs";
 const COMMIT_SHA = process.env.GITHUB_SHA || "";
 const GITHUB_REF = process.env.GITHUB_REF || "";
 
-function log(message: string): void {
-  console.log(message);
-}
+const logger = new Logger({
+  logFile: process.env.WORKFLOW_LOG_FILE,
+  prefix: "E2E-Local"
+});
 
 function runCommand(command: string, description: string): void {
-  log(`📝 === ${description} ===`);
+  logger.info(`=== ${description} ===`);
   try {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
-    log(`❌ ${description} failed`);
+    logger.error(`${description} failed`);
     throw error;
   }
 }
 
 function pushLogsToGit(): void {
-  log("📝");
-  log("📝 === Pushing Test Logs to Branch ===");
+  logger.info("");
+  logger.info("=== Pushing Test Logs to Branch ===");
 
   // Create logs directory
   mkdirSync("ci-logs", { recursive: true });
 
   // Copy test results if they exist
   if (existsSync("test-results")) {
-    log("📝 Copying test-results to ci-logs/");
+    logger.info("Copying test-results to ci-logs/");
     cpSync("test-results", "ci-logs/test-results", { recursive: true });
   }
 
   // Copy playwright report if it exists
   if (existsSync("playwright-report")) {
-    log("📝 Copying playwright-report to ci-logs/");
+    logger.info("Copying playwright-report to ci-logs/");
     cpSync("playwright-report", "ci-logs/playwright-report", { recursive: true });
   }
 
@@ -56,7 +58,7 @@ Ref: ${GITHUB_REF}
 Job: e2e-local
 `;
   writeFileSync("ci-logs/summary.txt", summary);
-  log("📝 Created summary.txt");
+  logger.info("Created summary.txt");
 
   // Configure git
   try {
@@ -69,52 +71,49 @@ Job: e2e-local
     try {
       execSync(`git commit -m "CI: Add E2E test logs for ${COMMIT_SHA}"`, { stdio: "inherit" });
     } catch (error) {
-      log("📝 No changes to commit");
+      logger.info("No changes to commit");
     }
 
     // Push to the current branch
     try {
       execSync(`git push origin HEAD:${GITHUB_REF}`, { stdio: "inherit" });
-      log("📝 ✅ Logs pushed successfully");
+      logger.success("Logs pushed successfully");
     } catch (error) {
-      log("📝 ⚠️ Failed to push logs");
+      logger.warn("Failed to push logs");
     }
   } catch (error) {
-    log("📝 ⚠️ Git operations failed");
+    logger.warn("Git operations failed");
   }
 }
 
 async function main() {
-  log("📝");
-  log("📝 ================================");
-  log("📝 === E2E Local Test Workflow ===");
-  log("📝 ================================");
-  log("📝");
-  log(`📝 Timestamp: ${new Date().toISOString()}`);
-  log(`📝 Commit: ${COMMIT_SHA}`);
-  log("📝");
+  logger.info("");
+  logger.section("E2E Local Test Workflow");
+  logger.info(`Timestamp: ${new Date().toISOString()}`);
+  logger.info(`Commit: ${COMMIT_SHA}`);
+  logger.info("");
 
   let testFailed = false;
 
   try {
     // Install dependencies
     runCommand("npm ci", "Installing dependencies");
-    log("📝");
+    logger.info("");
 
     // Install Playwright browsers
     runCommand("npx playwright install --with-deps chromium", "Installing Playwright browsers");
-    log("📝");
+    logger.info("");
 
     // Build application
     runCommand("npm run build", "Building application");
-    log("📝");
+    logger.info("");
 
     // Run E2E tests
     try {
       runCommand("npm run test", "Running E2E tests");
-      log("📝 ✅ E2E tests passed");
+      logger.success("E2E tests passed");
     } catch (error) {
-      log("📝 ❌ E2E tests failed");
+      logger.error("E2E tests failed");
       testFailed = true;
     }
   } finally {
@@ -123,13 +122,13 @@ async function main() {
   }
 
   if (testFailed) {
-    log("📝");
-    log("📝 ❌ Workflow completed with test failures");
+    logger.info("");
+    logger.error("Workflow completed with test failures");
     process.exit(1);
   }
 
-  log("📝");
-  log("📝 ✅ Workflow completed successfully");
+  logger.info("");
+  logger.success("Workflow completed successfully");
 }
 
 main().catch((error) => {
