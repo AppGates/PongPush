@@ -37,6 +37,72 @@ async function getWorkflowContext(): Promise<WorkflowContext> {
   return { sha, ref, branch, repository, token };
 }
 
+async function cleanupStaleBranches(
+  ctx: WorkflowContext,
+  git: GitClient,
+  github: GitHubClient,
+  logger: Logger
+): Promise<void> {
+  try {
+    // Get all remote claude branches
+    const result = await git.getCurrentBranch();  // Just to test git is working
+
+    // Use a direct spawn to get branch list
+    const { spawnProcess } = await import('./utils/process');
+    const branchResult = await spawnProcess(
+      ['git', 'branch', '-r'],
+      logger,
+      { logCommand: false }
+    );
+
+    if (!branchResult.success) {
+      logger.warn('Could not list branches for cleanup');
+      return;
+    }
+
+    const allBranches = branchResult.stdout
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('origin/claude/'))
+      .map(line => line.replace('origin/', ''));
+
+    logger.info(`Found ${allBranches.length} claude branches to check`);
+
+    // Skip current branch
+    const otherBranches = allBranches.filter(b => b !== ctx.branch);
+
+    if (otherBranches.length === 0) {
+      logger.info('No other branches to check');
+      return;
+    }
+
+    logger.info(`Checking ${otherBranches.length} other branches for cleanup`);
+
+    let deleted = 0;
+    let kept = 0;
+
+    for (const branch of otherBranches) {
+      const hasCommits = await git.hasCommitsAhead('origin/main', `origin/${branch}`);
+
+      if (!hasCommits) {
+        logger.info(`  ❌ ${branch}: no commits ahead, deleting...`);
+        const success = await git.deleteBranch('origin', branch);
+        if (success) {
+          deleted++;
+        }
+      } else {
+        logger.debug(`  ✅ ${branch}: has commits, keeping`);
+        kept++;
+      }
+    }
+
+    logger.info(`Cleanup complete: ${deleted} deleted, ${kept} kept`);
+  } catch (error) {
+    logger.warn(`Branch cleanup failed: ${error}`);
+    // Don't fail the whole workflow if cleanup fails
+  }
+}
+
 async function main() {
   try {
     // Get workflow context first (need SHA for log directory)
@@ -63,6 +129,11 @@ async function main() {
       logDir: baseLogDir,
       currentCommit: ctx.sha,
     }, logger);
+    logger.info('');
+
+    // Clean up stale branches (branches with no commits ahead of main)
+    logger.section('Cleaning Up Stale Branches');
+    await cleanupStaleBranches(ctx, git, github, logger);
     logger.info('');
 
     logger.section('Branch Information');
