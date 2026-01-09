@@ -42,7 +42,7 @@ jobs:
 
           # Run the TypeScript script and capture all output to commit-specific directory
           # The script creates its own logs in the same directory
-          if bun run .github/workflows-ts/auto-pr.ts 2>&1 | tee "${LOG_DIR}/bun-output.log"; then
+          if bun run src/workflows/auto-pr.ts 2>&1 | tee "${LOG_DIR}/bun-output.log"; then
             echo ""
             echo "=== Bun Execution Complete (Success) ==="
           else
