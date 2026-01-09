@@ -26,7 +26,7 @@ jobs:
       - name: Run Auto PR workflow
         env:
           GH_TOKEN: ${{ github.token }}
-        run: .github/scripts/run-workflow.sh src/workflows/auto-pr.ts
+        run: .github/scripts/run-workflow.sh auto-pr.ts
 
       - name: Upload auto-pr logs
         if: always()
