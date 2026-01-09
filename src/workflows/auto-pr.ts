@@ -104,20 +104,21 @@ async function cleanupStaleBranches(
 }
 
 async function main() {
+  // Get workflow context first (need SHA for log directory)
+  const ctx = await getWorkflowContext();
+
+  // Setup log directory structure
+  const baseLogDir = 'ci-logs';
+  const commitLogDir = ensureCommitLogDir(baseLogDir, ctx.sha,
+    new Logger({ prefix: 'Setup' }));
+
+  // Initialize logger with commit-specific directory
+  const logger = new Logger({
+    logFile: path.join(commitLogDir, 'auto-pr.log'),
+    prefix: 'AutoPR',
+  });
+
   try {
-    // Get workflow context first (need SHA for log directory)
-    const ctx = await getWorkflowContext();
-
-    // Setup log directory structure
-    const baseLogDir = 'ci-logs';
-    const commitLogDir = ensureCommitLogDir(baseLogDir, ctx.sha,
-      new Logger({ prefix: 'Setup' }));
-
-    // Initialize logger with commit-specific directory
-    const logger = new Logger({
-      logFile: path.join(commitLogDir, 'auto-pr.log'),
-      prefix: 'AutoPR',
-    });
 
     logger.section('Auto PR Workflow Started');
     logger.info(`Timestamp: ${new Date().toISOString()}`);

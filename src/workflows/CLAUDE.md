@@ -5,15 +5,17 @@ This document outlines the architecture, patterns, and best practices for develo
 ## Architecture Overview
 
 ```
-.github/workflows-ts/
+src/workflows/
 ├── utils/                  # Reusable utilities (shared across all workflows)
 │   ├── logger.ts          # Structured logging with file output
 │   ├── process.ts         # Process spawning utilities
 │   ├── github.ts          # GitHub API wrapper
 │   ├── git.ts             # Git operations wrapper
+│   ├── log-cleanup.ts     # Log directory cleanup
 │   └── log-pusher.ts      # Log pushing to branch
 ├── auto-pr.ts             # Auto-PR workflow logic
 ├── check-pipeline.ts      # Pipeline status checker (for testing)
+├── cleanup-branches.ts    # Stale branch cleanup utility
 ├── package.json           # Dependencies
 ├── tsconfig.json          # TypeScript configuration
 └── CLAUDE.md              # This file
@@ -226,7 +228,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Capture all output for debugging
-          if bun run .github/workflows-ts/workflow-name.ts 2>&1 | tee -a workflow.log; then
+          if bun run src/workflows/workflow-name.ts 2>&1 | tee -a workflow.log; then
             echo "=== Workflow Complete (Success) ===" | tee -a workflow.log
           else
             echo "=== Workflow Failed ===" | tee -a workflow.log
@@ -260,23 +262,29 @@ jobs:
 
 1. **Local validation:**
    ```bash
-   bun run .github/workflows-ts/workflow-name.ts
+   bun run src/workflows/workflow-name.ts
    ```
 
 2. **Type checking:**
    ```bash
-   cd .github/workflows-ts && tsc --noEmit
+   npm run type-check:workflows
+   # Or directly:
+   cd src/workflows && tsc --noEmit
    ```
 
 ### After Pushing
 
+**CRITICAL: Always check pipeline results after pushing!**
+
+You MUST verify that your changes work correctly by checking the pipeline results. Never assume your changes worked without verification.
+
 **Use the pipeline checker tool:**
 ```bash
 # Push and wait for completion
-git push && bun run .github/workflows-ts/check-pipeline.ts
+git push && bun run src/workflows/check-pipeline.ts
 
-# Or just check current logs
-bun run .github/workflows-ts/check-pipeline.ts --no-wait
+# Or just check current logs without waiting
+bun run src/workflows/check-pipeline.ts --no-wait
 ```
 
 The `check-pipeline.ts` utility will:
@@ -285,6 +293,23 @@ The `check-pipeline.ts` utility will:
 - Display log file summaries
 - Scan for errors in logs
 - Show final success/failure status
+
+**After merging to main:**
+
+When a PR is merged to main, ALWAYS check the main branch pipelines:
+1. Verify the build job passes
+2. Check that deployment to GitHub Pages succeeds
+3. Verify E2E tests pass on the deployed site
+4. Review any warnings or issues in the logs
+
+Use the pipeline checker on main:
+```bash
+git checkout main
+git pull
+bun run src/workflows/check-pipeline.ts --no-wait
+```
+
+Or check via GitHub Actions UI: https://github.com/[owner]/[repo]/actions
 
 **Manual checks:**
 1. **Check logs are pushed to branch:**
@@ -380,12 +405,13 @@ logger.info('Cleaning up resources...');
 
 ## Adding New Workflows
 
-1. **Create script:** `.github/workflows-ts/new-workflow.ts`
-2. **Use utilities:** Import from `utils/`
+1. **Create script:** `src/workflows/new-workflow.ts`
+2. **Use utilities:** Import from `./utils/`
 3. **Follow pattern:** Use standard structure above
-4. **Add YAML:** `.github/workflows/new-workflow.yml`
-5. **Test thoroughly:** Check logs are captured
-6. **Document:** Add notes if workflow has special requirements
+4. **Add YAML:** `.github/workflows/new-workflow.yml` (reference `src/workflows/new-workflow.ts`)
+5. **Type check:** Run `npm run type-check:workflows` to verify
+6. **Test thoroughly:** Push and check pipeline results
+7. **Document:** Add notes if workflow has special requirements
 
 ## Migration Checklist
 

@@ -29,4 +29,4 @@ jobs:
           echo "Timestamp: $(date)"
           echo ""
 
-          bun run .github/workflows-ts/cleanup-branches.ts
+          bun run src/workflows/cleanup-branches.ts
