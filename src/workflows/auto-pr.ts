@@ -44,14 +44,10 @@ async function cleanupStaleBranches(
   logger: Logger
 ): Promise<void> {
   try {
-    // Fetch all branches from origin to ensure we see all remote branches
-    logger.debug('Fetching all branches from origin...');
-    await git.fetch('origin');
-
-    // Use a direct spawn to get branch list
+    // Query remote directly to get all branches (not just fetched ones)
     const { spawnProcess } = await import('./utils/process');
     const branchResult = await spawnProcess(
-      ['git', 'branch', '-r'],
+      ['git', 'ls-remote', '--heads', 'origin', 'refs/heads/claude/*'],
       logger,
       { logCommand: false }
     );
@@ -61,11 +57,15 @@ async function cleanupStaleBranches(
       return;
     }
 
+    // Parse ls-remote output: "hash refs/heads/branch-name"
     const allBranches = branchResult.stdout
       .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.startsWith('origin/claude/'))
-      .map(line => line.replace('origin/', ''));
+      .filter(line => line.trim())
+      .map(line => {
+        const match = line.match(/refs\/heads\/(.+)$/);
+        return match ? match[1] : '';
+      })
+      .filter(name => name.startsWith('claude/'));
 
     logger.info(`Found ${allBranches.length} claude branches to check`);
 
