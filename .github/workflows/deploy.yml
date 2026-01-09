@@ -53,6 +53,10 @@ jobs:
           path: ci-logs/
           retention-days: 7
 
+      - name: Push logs to branch
+        if: always() && startsWith(github.ref, 'refs/heads/claude/')
+        run: ./push-logs.sh "build logs"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -134,6 +138,10 @@ jobs:
           name: playwright-screenshots
           path: ci-logs/test-results/
           retention-days: 7
+
+      - name: Push logs to branch
+        if: always() && startsWith(github.ref, 'refs/heads/claude/')
+        run: ./push-logs.sh "e2e-local logs"
 
   e2e-deployed:
     runs-on: ubuntu-latest

@@ -18,6 +18,15 @@ interface CheckResult {
   errors: string[];
 }
 
+interface JobStatus {
+  name: string;
+  status: 'success' | 'failed' | 'pending';
+  statusFile?: string;
+}
+
+// Expected workflows for claude/** branches
+const EXPECTED_WORKFLOWS = ['build', 'e2e-local', 'auto-pr'];
+
 const logger = new Logger({ prefix: 'PipelineCheck' });
 
 async function getCurrentBranch(): Promise<string> {
@@ -45,16 +54,36 @@ async function pullBranch(branch: string): Promise<boolean> {
   }
 }
 
-async function waitForLogs(branch: string, sha: string, timeoutSeconds = 60, skipWait = false): Promise<boolean> {
-  const startTime = Date.now();
-  const pollInterval = 10000; // 10 seconds
+function getJobStatuses(sha: string): JobStatus[] {
   const shortSha = sha.substring(0, 7);
   const logDir = `ci-logs/${shortSha}`;
 
-  logger.section('Waiting for CI Logs');
+  return EXPECTED_WORKFLOWS.map(workflowName => {
+    const statusFile = `${logDir}/${workflowName}.status`;
+
+    if (!existsSync(statusFile)) {
+      return { name: workflowName, status: 'pending' as const };
+    }
+
+    try {
+      const content = readFileSync(statusFile, 'utf-8').trim();
+      const status = content === 'success' ? 'success' : 'failed';
+      return { name: workflowName, status, statusFile };
+    } catch (error) {
+      return { name: workflowName, status: 'pending' as const };
+    }
+  });
+}
+
+async function waitForAllJobs(branch: string, sha: string, timeoutSeconds = 60, skipWait = false): Promise<JobStatus[]> {
+  const startTime = Date.now();
+  const pollInterval = 10000; // 10 seconds
+  const shortSha = sha.substring(0, 7);
+
+  logger.section('Waiting for CI Jobs');
   logger.info(`Branch: ${branch}`);
   logger.info(`Commit: ${shortSha}`);
-  logger.info(`Looking for: ${logDir}/`);
+  logger.info(`Expected jobs: ${EXPECTED_WORKFLOWS.join(', ')}`);
 
   if (skipWait) {
     logger.info('Checking current status only (no waiting)');
@@ -67,27 +96,43 @@ async function waitForLogs(branch: string, sha: string, timeoutSeconds = 60, ski
   while (true) {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
 
-    // Check if logs directory exists
-    if (existsSync(logDir)) {
-      logger.success(`Found logs at ${logDir}/`);
-      return true;
+    // Pull the branch to get latest commits with logs
+    await pullBranch(branch);
+
+    // Check status of all jobs
+    const statuses = getJobStatuses(sha);
+    const pending = statuses.filter(s => s.status === 'pending');
+    const completed = statuses.filter(s => s.status !== 'pending');
+
+    if (completed.length > 0) {
+      logger.info(`[${elapsed}s] Jobs: ${completed.length}/${EXPECTED_WORKFLOWS.length} completed`);
+      for (const job of completed) {
+        const icon = job.status === 'success' ? '✅' : '❌';
+        logger.info(`  ${icon} ${job.name}: ${job.status}`);
+      }
+    }
+
+    // All jobs complete?
+    if (pending.length === 0) {
+      logger.success('All jobs completed!');
+      logger.info('');
+      return statuses;
     }
 
     if (skipWait) {
-      logger.warn(`Logs not found at ${logDir}/ (workflow may still be running)`);
-      return false;
+      logger.warn(`${pending.length} job(s) still pending: ${pending.map(j => j.name).join(', ')}`);
+      return statuses;
     }
 
     if (elapsed >= timeoutSeconds) {
-      logger.warn(`Timeout after ${timeoutSeconds}s - logs not found yet`);
-      logger.info('Workflow may still be running or failed to start');
-      return false;
+      logger.warn(`Timeout after ${timeoutSeconds}s - ${pending.length} job(s) still pending`);
+      logger.info(`Pending: ${pending.map(j => j.name).join(', ')}`);
+      return statuses;
     }
 
-    logger.info(`[${elapsed}s] Logs not found yet, pulling branch...`);
-
-    // Pull the branch to get latest commits with logs
-    await pullBranch(branch);
+    if (completed.length === 0) {
+      logger.info(`[${elapsed}s] No jobs completed yet, waiting...`);
+    }
 
     // Wait before next check
     await Bun.sleep(pollInterval);
@@ -202,53 +247,92 @@ async function checkPipeline(skipWait = false, timeoutSeconds = 60): Promise<Che
     // Get current context
     const branch = await getCurrentBranch();
     const sha = await getLatestCommitSha();
+    const shortSha = sha.substring(0, 7);
 
-    // Wait for logs to be pushed by CI (or just check once)
-    const logsFound = await waitForLogs(branch, sha, timeoutSeconds, skipWait);
+    // Wait for all jobs to complete (or just check once)
+    const jobStatuses = await waitForAllJobs(branch, sha, timeoutSeconds, skipWait);
 
-    // Find and display log files for this commit
+    // Check overall status
+    const failed = jobStatuses.filter(j => j.status === 'failed');
+    const pending = jobStatuses.filter(j => j.status === 'pending');
+    const success = jobStatuses.filter(j => j.status === 'success');
+    const allComplete = pending.length === 0;
+    const allSuccess = allComplete && failed.length === 0;
+
+    const duration = Math.floor((Date.now() - startTime) / 1000);
     const logFiles = findLogFiles(sha);
 
-    if (logFiles.length > 0) {
-      displayLogSummary(logFiles);
+    logger.section('Final Result');
 
-      // Check for errors in logs
-      const errors = displayLogErrors(logFiles);
-
-      const duration = Math.floor((Date.now() - startTime) / 1000);
-
-      logger.section('Final Result');
-      if (errors.length === 0) {
-        logger.success(`Pipeline passed! (${duration}s)`);
-      } else {
-        logger.error(`Pipeline failed with ${errors.length} error(s) (${duration}s)`);
-      }
-
+    // Success case - very short report
+    if (allSuccess) {
+      logger.success(`✅ All jobs passed! (${duration}s)`);
       return {
-        success: errors.length === 0,
+        success: true,
         duration,
-        conclusion: errors.length === 0 ? 'success' : 'failure',
+        conclusion: 'success',
         logFiles,
-        errors,
+        errors: [],
       };
-    } else {
-      const duration = Math.floor((Date.now() - startTime) / 1000);
+    }
 
-      logger.section('Final Result');
-      if (skipWait) {
-        logger.warn(`No logs found yet - workflow may still be running (${duration}s)`);
-      } else {
-        logger.warn(`Timeout waiting for logs (${duration}s)`);
+    // Failure case - detailed report
+    if (failed.length > 0) {
+      logger.error(`❌ ${failed.length} job(s) failed (${duration}s)`);
+      logger.info('');
+
+      for (const job of failed) {
+        logger.error(`Failed job: ${job.name}`);
+
+        // List relevant log files for this job
+        const jobLogFiles = logFiles.filter(f =>
+          f.includes(shortSha) && (
+            f.includes(job.name) ||
+            f.includes('stdout.log') ||
+            f.includes('stderr.log')
+          )
+        );
+
+        if (jobLogFiles.length > 0) {
+          logger.info(`  Relevant log files:`);
+          for (const logFile of jobLogFiles) {
+            logger.info(`    📄 ${logFile}`);
+          }
+        }
+        logger.info('');
       }
 
       return {
         success: false,
         duration,
-        conclusion: 'unknown',
-        logFiles: [],
-        errors: ['No logs found - workflow may not have run or is still in progress'],
+        conclusion: 'failure',
+        logFiles,
+        errors: failed.map(j => `Job '${j.name}' failed`),
       };
     }
+
+    // Pending/timeout case
+    if (pending.length > 0) {
+      logger.warn(`⏱️  ${pending.length} job(s) still pending (${duration}s)`);
+      logger.info(`Pending jobs: ${pending.map(j => j.name).join(', ')}`);
+
+      return {
+        success: false,
+        duration,
+        conclusion: 'pending',
+        logFiles,
+        errors: pending.map(j => `Job '${j.name}' did not complete`),
+      };
+    }
+
+    // Shouldn't reach here
+    return {
+      success: false,
+      duration,
+      conclusion: 'unknown',
+      logFiles,
+      errors: ['Unknown pipeline state'],
+    };
 
   } catch (error) {
     logger.error(`Pipeline check failed: ${error}`);
@@ -287,24 +371,30 @@ Options:
   -t, --timeout <seconds> Timeout in seconds (default: 60)
 
 Description:
-  This script waits for GitHub Actions workflows to push CI logs for the
-  current commit. It periodically pulls the branch and checks for logs in
-  ci-logs/<commit-sha>/.
+  This script waits for GitHub Actions jobs to complete by checking for
+  semaphore status files written by each job in ci-logs/<commit-sha>/.
 
-  Once logs are found, it analyzes them for errors and reports the result.
+  Expected jobs for claude/** branches: ${EXPECTED_WORKFLOWS.join(', ')}
+
+  Each job writes a <job-name>.status file containing "success" or "failed".
+  The script polls the branch every 10 seconds until all status files appear.
+
+  Reports:
+  - Success: Very short report (just "All jobs passed!")
+  - Failure: Detailed report with failed job names and relevant log files
 
 How it works:
   1. Gets current branch and commit SHA
   2. Polls by pulling the branch every 10 seconds
-  3. Checks if ci-logs/<commit-sha>/ directory exists
-  4. Once found, analyzes log files for errors
-  5. Reports success or failure based on log analysis
+  3. Checks for .status files for all expected jobs
+  4. Once all complete, generates report based on results
+  5. Success = short report, Failure = detailed with log paths
 
 Examples:
   # Check pipeline status for current commit
   bun run check-pipeline.ts
 
-  # Just check logs without waiting
+  # Just check current status without waiting
   bun run check-pipeline.ts --no-wait
 
   # Wait up to 2 minutes

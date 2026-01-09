@@ -38,9 +38,4 @@ jobs:
 
       - name: Push logs to branch
         if: always()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f ci-logs/
-          git commit -m "CI: Add auto-PR logs for ${{ github.sha }}" || true
-          git push origin HEAD:${{ github.ref }} || true
+        run: ./push-logs.sh "auto-PR logs"

@@ -3,17 +3,17 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-09T22:47:16.268Z
-📝 Commit: e092d0b3e21fe45627b38b86a087901f4dfa97f6
+📝 Timestamp: 2026-01-09T23:00:23.780Z
+📝 Commit: 9b17b74576fde682b0b28e1b09d6078b0537bca9
 📝 
 📝 
 📝 --- Cleaning Up Old Logs ---
 📝 Log directory: ci-logs
-📝 Current commit: e092d0b
+📝 Current commit: 9b17b74
 📝 Dry run: no
 📝 Found 2 log directory(ies)
-🔍 Preserving: e092d0b (current commit)
-🔍 Deleting: e8049c2
+🔍 Preserving: 9b17b74 (current commit)
+🔍 Deleting: 5f9bcf1
 📝 Cleanup complete: 1 deleted, 1 preserved
 📝 
 📝 
@@ -92,65 +92,75 @@
 📝 No existing PR found for branch claude/add-pipeline-check-rule-2qgGX
 📝 No existing PR found. Creating new PR...
 🔍 Running: git log -1 --pretty=%s
-🔍 Latest commit message: Feature: Add optional timeout parameter to check-pipeline script
-📝 Commit message: Feature: Add optional timeout parameter to check-pipeline script
+🔍 Latest commit message: Feature: Implement semaphore-based pipeline status checking
+📝 Commit message: Feature: Implement semaphore-based pipeline status checking
 🔍 Running: git log origin/main..HEAD --oneline
 📝 
 📝 --- Creating PR ---
-📝 Creating PR: "Feature: Add optional timeout parameter to check-pipeline script"
+📝 Creating PR: "Feature: Implement semaphore-based pipeline status checking"
 🔍 Base: main, Head: claude/add-pipeline-check-rule-2qgGX
-🔍 Running: gh pr create --title Feature: Add optional timeout parameter to check-pipeline script --body ## Automated PR
+🔍 Running: gh pr create --title Feature: Implement semaphore-based pipeline status checking --body ## Automated PR
 
 This PR was automatically created from a claude/** branch.
 
 ### Changes
-e092d0b Feature: Add optional timeout parameter to check-pipeline script
-b4e9897 CI: Add auto-PR logs for e8049c260735c0b8a91d7551ef0b2ae2cd69df2c
+9b17b74 Feature: Implement semaphore-based pipeline status checking
+ad02f79 CI: Add auto-PR logs for 5f9bcf1d1b434dcb1bc5a49332e57cc3147513ea
 
 ---
 **Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/add-pipeline-check-rule-2qgGX
-✅ PR created: https://github.com/AppGates/PongPush/pull/21
-✅ PR created: https://github.com/AppGates/PongPush/pull/21
-📝 PR Number: 21
+✅ PR created: https://github.com/AppGates/PongPush/pull/22
+✅ PR created: https://github.com/AppGates/PongPush/pull/22
+📝 PR Number: 22
 📝 
 📝 ===========================
 📝 === Enabling Auto-Merge ===
 📝 ===========================
 📝 
-📝 Attempting to enable auto-merge for PR #21...
-📝 Enabling auto-merge for PR #21 with method: merge
-🔍 Running: gh pr merge 21 --auto --merge
-🔍 stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
+📝 Attempting to enable auto-merge for PR #22...
+📝 Enabling auto-merge for PR #22 with method: merge
+🔍 Running: gh pr merge 22 --auto --merge
+🔍 stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
 ⚠️ gh pr merge --auto failed with exit code 1
-⚠️ stderr: GraphQL: Pull request Protected branch rules not configured for this branch (enablePullRequestAutoMerge)
+⚠️ stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
 ⚠️ Auto-merge command failed
 📝 
 📝 =======================
 📝 === Final PR Status ===
 📝 =======================
 📝 
-🔍 Running: gh pr view 21 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
-🔍 PR #21 details: {
+🔍 Running: gh pr view 22 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #22 details: {
   "autoMergeRequest": null,
   "mergeStateStatus": "UNSTABLE",
   "mergeable": "MERGEABLE",
-  "number": 21,
+  "number": 22,
   "state": "OPEN",
   "statusCheckRollup": [
     {
       "__typename": "CheckRun",
       "completedAt": "0001-01-01T00:00:00Z",
       "conclusion": "",
-      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20867804017/job/59963000211",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20868051931/job/59963758108",
       "name": "create-pr",
-      "startedAt": "2026-01-09T22:47:11Z",
+      "startedAt": "2026-01-09T23:00:18Z",
       "status": "IN_PROGRESS",
       "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20868051811/job/59963757678",
+      "name": "build",
+      "startedAt": "2026-01-09T23:00:18Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
     }
   ],
-  "title": "Feature: Add optional timeout parameter to check-pipeline script"
+  "title": "Feature: Implement semaphore-based pipeline status checking"
 }
-📝 Title: Feature: Add optional timeout parameter to check-pipeline script
+📝 Title: Feature: Implement semaphore-based pipeline status checking
 📝 State: OPEN
 📝 Mergeable: MERGEABLE
 📝 Merge state: UNSTABLE
@@ -158,6 +168,7 @@ b4e9897 CI: Add auto-PR logs for e8049c260735c0b8a91d7551ef0b2ae2cd69df2c
 📝 
 📝 --- Status Checks ---
 📝   - create-pr: IN_PROGRESS
+📝   - build: IN_PROGRESS
 📝 
 📝 
 📝 =========================
