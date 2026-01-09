@@ -3,7 +3,6 @@
  * Wraps common GitHub operations with error handling and logging
  */
 
-import { $ } from 'bun';
 import type { Logger } from './logger';
 
 export interface PullRequest {
@@ -39,11 +38,23 @@ export class GitHubClient {
    */
   async getRepositorySettings(): Promise<RepositorySettings | null> {
     try {
-      const result = await $`gh api repos/${this.repository} --jq '{allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}'`.env({
-        GH_TOKEN: this.token,
-      }).quiet();
+      const proc = Bun.spawn(['gh', 'api', `repos/${this.repository}`, '--jq', '{allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}'], {
+        env: { ...process.env, GH_TOKEN: this.token, GITHUB_TOKEN: this.token },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
 
-      const settings = JSON.parse(result.stdout.toString());
+      const stdout = await new Response(proc.stdout).text();
+      const stderr = await new Response(proc.stderr).text();
+      const exitCode = await proc.exited;
+
+      if (exitCode !== 0) {
+        this.logger.error(`gh api failed with exit code ${exitCode}`);
+        if (stderr) this.logger.error(`stderr: ${stderr}`);
+        return null;
+      }
+
+      const settings = JSON.parse(stdout);
       this.logger.debug(`Repository settings: ${JSON.stringify(settings, null, 2)}`);
       return settings;
     } catch (error) {
@@ -57,11 +68,23 @@ export class GitHubClient {
    */
   async findPullRequest(branch: string): Promise<number | null> {
     try {
-      const result = await $`gh pr list --head ${branch} --json number --jq '.[0].number'`.env({
-        GH_TOKEN: this.token,
-      }).quiet();
+      const proc = Bun.spawn(['gh', 'pr', 'list', '--head', branch, '--json', 'number', '--jq', '.[0].number'], {
+        env: { ...process.env, GH_TOKEN: this.token, GITHUB_TOKEN: this.token },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
 
-      const output = result.stdout.toString().trim();
+      const stdout = await new Response(proc.stdout).text();
+      const stderr = await new Response(proc.stderr).text();
+      const exitCode = await proc.exited;
+
+      if (exitCode !== 0) {
+        this.logger.error(`gh pr list failed with exit code ${exitCode}`);
+        if (stderr) this.logger.error(`stderr: ${stderr.trim()}`);
+        return null;
+      }
+
+      const output = stdout.trim();
       if (output && output !== 'null') {
         const prNumber = parseInt(output, 10);
         this.logger.info(`Found existing PR #${prNumber} for branch ${branch}`);
@@ -81,11 +104,23 @@ export class GitHubClient {
    */
   async getPullRequestDetails(prNumber: number): Promise<PullRequest | null> {
     try {
-      const result = await $`gh pr view ${prNumber} --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup`.env({
-        GH_TOKEN: this.token,
-      }).quiet();
+      const proc = Bun.spawn(['gh', 'pr', 'view', String(prNumber), '--json', 'number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup'], {
+        env: { ...process.env, GH_TOKEN: this.token, GITHUB_TOKEN: this.token },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
 
-      const pr = JSON.parse(result.stdout.toString());
+      const stdout = await new Response(proc.stdout).text();
+      const stderr = await new Response(proc.stderr).text();
+      const exitCode = await proc.exited;
+
+      if (exitCode !== 0) {
+        this.logger.error(`gh pr view failed with exit code ${exitCode}`);
+        if (stderr) this.logger.error(`stderr: ${stderr.trim()}`);
+        return null;
+      }
+
+      const pr = JSON.parse(stdout);
       this.logger.debug(`PR #${prNumber} details: ${JSON.stringify(pr, null, 2)}`);
       return pr;
     } catch (error) {
@@ -107,11 +142,23 @@ export class GitHubClient {
       this.logger.info(`Creating PR: "${title}"`);
       this.logger.debug(`Base: ${base}, Head: ${head}`);
 
-      const result = await $`gh pr create --title ${title} --body ${body} --base ${base} --head ${head}`.env({
-        GH_TOKEN: this.token,
-      }).quiet();
+      const proc = Bun.spawn(['gh', 'pr', 'create', '--title', title, '--body', body, '--base', base, '--head', head], {
+        env: { ...process.env, GH_TOKEN: this.token, GITHUB_TOKEN: this.token },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
 
-      const url = result.stdout.toString().trim();
+      const stdout = await new Response(proc.stdout).text();
+      const stderr = await new Response(proc.stderr).text();
+      const exitCode = await proc.exited;
+
+      if (exitCode !== 0) {
+        this.logger.error(`gh pr create failed with exit code ${exitCode}`);
+        if (stderr) this.logger.error(`stderr: ${stderr.trim()}`);
+        return null;
+      }
+
+      const url = stdout.trim();
       this.logger.success(`PR created: ${url}`);
 
       // Extract PR number from URL
@@ -143,9 +190,21 @@ export class GitHubClient {
       this.logger.info(`Enabling auto-merge for PR #${prNumber} with method: ${mergeMethod}`);
 
       const flag = mergeMethod === 'squash' ? '--squash' : mergeMethod === 'rebase' ? '--rebase' : '--merge';
-      await $`gh pr merge ${prNumber} --auto ${flag}`.env({
-        GH_TOKEN: this.token,
-      }).quiet();
+      const proc = Bun.spawn(['gh', 'pr', 'merge', String(prNumber), '--auto', flag], {
+        env: { ...process.env, GH_TOKEN: this.token, GITHUB_TOKEN: this.token },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
+
+      const stdout = await new Response(proc.stdout).text();
+      const stderr = await new Response(proc.stderr).text();
+      const exitCode = await proc.exited;
+
+      if (exitCode !== 0) {
+        this.logger.warn(`gh pr merge --auto failed with exit code ${exitCode}`);
+        if (stderr) this.logger.warn(`stderr: ${stderr.trim()}`);
+        return false;
+      }
 
       this.logger.success(`Auto-merge enabled successfully for PR #${prNumber}`);
       return true;
