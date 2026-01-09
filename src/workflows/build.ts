@@ -2,6 +2,7 @@
 
 import { execSync } from "child_process";
 import { writeFileSync, mkdirSync } from "fs";
+import { Logger } from "./utils/logger";
 
 /**
  * Build workflow
@@ -11,52 +12,49 @@ import { writeFileSync, mkdirSync } from "fs";
  */
 
 const GITHUB_TOKEN = process.env.VITE_GITHUB_TOKEN || "";
-
-function log(message: string): void {
-  console.log(message);
-}
+const logger = new Logger({
+  logFile: process.env.WORKFLOW_LOG_FILE,
+  prefix: "Build"
+});
 
 function runCommand(command: string, description: string): void {
-  log(`📝 === ${description} ===`);
+  logger.info(`=== ${description} ===`);
   try {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
-    log(`❌ ${description} failed`);
+    logger.error(`${description} failed`);
     throw error;
   }
 }
 
 async function main() {
-  log("📝");
-  log("📝 ==========================");
-  log("📝 === Build Workflow Started ===");
-  log("📝 ==========================");
-  log("📝");
-  log(`📝 Timestamp: ${new Date().toISOString()}`);
-  log("📝");
+  logger.info("");
+  logger.section("Build Workflow Started");
+  logger.info(`Timestamp: ${new Date().toISOString()}`);
+  logger.info("");
 
   // Install dependencies
   runCommand("npm ci", "Installing dependencies");
-  log("📝");
+  logger.info("");
 
   // Type check
   runCommand("npm run type-check", "Running type check");
-  log("📝");
+  logger.info("");
 
   // Inject GitHub token into build
-  log("📝 === Injecting GitHub token ===");
+  logger.info("=== Injecting GitHub token ===");
   mkdirSync("public", { recursive: true });
   writeFileSync(
     "public/config.js",
     `window.__GITHUB_TOKEN__ = '${GITHUB_TOKEN}';`
   );
-  log("📝");
+  logger.info("");
 
   // Build application
   runCommand("npm run build", "Building application");
-  log("📝");
+  logger.info("");
 
-  log("📝 ✅ Build completed successfully");
+  logger.success("Build completed successfully");
 }
 
 main().catch((error) => {

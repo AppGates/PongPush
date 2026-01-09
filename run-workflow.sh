@@ -15,4 +15,7 @@ LOG_DIR="ci-logs/${SHORT_SHA}"
 
 mkdir -p "${LOG_DIR}"
 
+# Set log file path for the workflow to use with Logger
+export WORKFLOW_LOG_FILE="${LOG_DIR}/workflow.log"
+
 bun run "$WORKFLOW_FILE" > >(tee "${LOG_DIR}/stdout.log") 2> >(tee "${LOG_DIR}/stderr.log" >&2)
