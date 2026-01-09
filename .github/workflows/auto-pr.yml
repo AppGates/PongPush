@@ -27,30 +27,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get short commit SHA for log directory
           SHORT_SHA=$(git rev-parse --short=7 HEAD)
           LOG_DIR="ci-logs/${SHORT_SHA}"
-
-          echo "=== Starting Bun Auto-PR Workflow ==="
-          echo "Timestamp: $(date)"
-          echo "Commit: ${SHORT_SHA}"
-          echo "Log directory: ${LOG_DIR}"
-          echo ""
-
-          # Create log directory BEFORE running TypeScript (needed for tee)
           mkdir -p "${LOG_DIR}"
-
-          # Run the TypeScript script and capture all output to commit-specific directory
-          # The script creates its own logs in the same directory
-          if bun run src/workflows/auto-pr.ts 2>&1 | tee "${LOG_DIR}/bun-output.log"; then
-            echo ""
-            echo "=== Bun Execution Complete (Success) ==="
-          else
-            EXIT_CODE=$?
-            echo ""
-            echo "=== Bun Execution Failed (Exit code: $EXIT_CODE) ==="
-            exit 0  # Don't fail the workflow so logs get pushed
-          fi
+          bun run src/workflows/auto-pr.ts > "${LOG_DIR}/stdout.log" 2> "${LOG_DIR}/stderr.log" || true
 
       - name: Upload auto-pr logs
         if: always()
@@ -63,29 +43,8 @@ jobs:
       - name: Push logs to branch
         if: always()
         run: |
-          SHORT_SHA=$(git rev-parse --short=7 HEAD)
-          LOG_DIR="ci-logs/${SHORT_SHA}"
-
-          # Create summary in the commit log directory
-          if [ -d "${LOG_DIR}" ]; then
-            echo "=== Auto PR Workflow Log ===" > "${LOG_DIR}/summary.txt"
-            echo "Date: $(date)" >> "${LOG_DIR}/summary.txt"
-            echo "Commit: ${{ github.sha }}" >> "${LOG_DIR}/summary.txt"
-            echo "Short SHA: ${SHORT_SHA}" >> "${LOG_DIR}/summary.txt"
-            echo "Ref: ${{ github.ref }}" >> "${LOG_DIR}/summary.txt"
-            echo "Job: create-pr" >> "${LOG_DIR}/summary.txt"
-            echo "" >> "${LOG_DIR}/summary.txt"
-            echo "Log files in ci-logs/${SHORT_SHA}/:" >> "${LOG_DIR}/summary.txt"
-            ls -lh "${LOG_DIR}" >> "${LOG_DIR}/summary.txt" 2>&1 || true
-          fi
-
-          # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Add and commit logs
           git add -f ci-logs/
-          git commit -m "CI: Add auto-PR logs for ${{ github.sha }}" || echo "No changes to commit"
-
-          # Push to the current branch
-          git push origin HEAD:${{ github.ref }} || echo "Failed to push logs"
+          git commit -m "CI: Add auto-PR logs for ${{ github.sha }}" || true
+          git push origin HEAD:${{ github.ref }} || true
