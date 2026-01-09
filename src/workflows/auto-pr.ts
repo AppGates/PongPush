@@ -44,8 +44,9 @@ async function cleanupStaleBranches(
   logger: Logger
 ): Promise<void> {
   try {
-    // Get all remote claude branches
-    const result = await git.getCurrentBranch();  // Just to test git is working
+    // Fetch all branches from origin to ensure we see all remote branches
+    logger.debug('Fetching all branches from origin...');
+    await git.fetch('origin');
 
     // Use a direct spawn to get branch list
     const { spawnProcess } = await import('./utils/process');
