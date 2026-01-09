@@ -1,0 +1,23 @@
+2026-01-09T17:31:03.510Z INFO    [AutoPR] 
+2026-01-09T17:31:03.510Z INFO    [AutoPR] ================================
+2026-01-09T17:31:03.510Z INFO    [AutoPR] === Auto PR Workflow Started ===
+2026-01-09T17:31:03.510Z INFO    [AutoPR] ================================
+2026-01-09T17:31:03.510Z INFO    [AutoPR] 
+2026-01-09T17:31:03.510Z INFO    [AutoPR] Timestamp: 2026-01-09T17:31:03.510Z
+2026-01-09T17:31:03.510Z INFO    [AutoPR] Commit: 9680ab4c77e2e1cdec541c62b1e664bcbe964f6d
+2026-01-09T17:31:03.510Z INFO    [AutoPR] 
+2026-01-09T17:31:03.511Z INFO    [AutoPR] 
+2026-01-09T17:31:03.511Z INFO    [AutoPR] --- Cleaning Up Old Logs ---
+2026-01-09T17:31:03.511Z INFO    [AutoPR] Log directory: ci-logs
+2026-01-09T17:31:03.511Z INFO    [AutoPR] Current commit: 9680ab4
+2026-01-09T17:31:03.511Z INFO    [AutoPR] Dry run: no
+2026-01-09T17:31:03.511Z INFO    [AutoPR] Found 2 log directory(ies)
+2026-01-09T17:31:03.511Z DEBUG   [AutoPR] Preserving: 9680ab4 (current commit)
+2026-01-09T17:31:03.511Z DEBUG   [AutoPR] Deleting: 484ed1b
+2026-01-09T17:31:03.511Z INFO    [AutoPR] Cleanup complete: 1 deleted, 1 preserved
+2026-01-09T17:31:03.511Z INFO    [AutoPR] 
+2026-01-09T17:31:03.511Z INFO    [AutoPR] 
+2026-01-09T17:31:03.511Z INFO    [AutoPR] ==================================
+2026-01-09T17:31:03.511Z INFO    [AutoPR] === Cleaning Up Stale Branches ===
+2026-01-09T17:31:03.511Z INFO    [AutoPR] ==================================
+2026-01-09T17:31:03.511Z INFO    [AutoPR] 
