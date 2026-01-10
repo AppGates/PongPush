@@ -1,0 +1,32 @@
+📝 
+📝 
+📝 ==============================
+📝 === Build Workflow Started ===
+📝 ==============================
+📝 
+📝 Timestamp: 2026-01-10T07:04:19.207Z
+📝 
+📝 === Installing dependencies ===
+
+added 40 packages, and audited 41 packages in 3s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+📝 
+📝 === Running type check ===
+
+> pongpush@1.0.0 type-check
+> npm run type-check:app && npm run type-check:workflows
+
+
+> pongpush@1.0.0 type-check:app
+> tsc --noEmit
+
+
+> pongpush@1.0.0 type-check:workflows
+> tsc --project src/workflows/tsconfig.json --noEmit
+
+src/workflows/check-pipeline-api.ts(24,29): error TS1246: An interface property cannot have an initializer.
+❌ Running type check failed
