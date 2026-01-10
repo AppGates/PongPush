@@ -1,0 +1,5 @@
+=== E2E Test Run ===
+Date: 2026-01-10T06:18:37.709Z
+Commit: ff2715d57e2ec777f8d899d720c4d27474984597
+Ref: refs/heads/claude/fix-pipeline-zUPNQ
+Job: e2e-local
