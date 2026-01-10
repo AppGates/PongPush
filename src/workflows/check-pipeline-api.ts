@@ -20,8 +20,6 @@ interface WorkflowRun {
   html_url: string;
   created_at: string;
   updated_at: string;
-  // INTENTIONAL ERROR FOR TESTING: Remove this line and the next
-  testBrokenField: string = "this will cause a type error";
 }
 
 interface WorkflowJob {
