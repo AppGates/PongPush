@@ -31,23 +31,25 @@ function runCommand(command: string, description: string): void {
   }
 }
 
-function pushLogsToGit(): void {
+function copyTestArtifacts(): void {
   logger.info("");
-  logger.info("=== Pushing Test Logs to Branch ===");
+  logger.info("=== Copying Test Artifacts ===");
 
-  // Create logs directory
-  mkdirSync("ci-logs", { recursive: true });
+  // Get the commit SHA for the log directory
+  const shortSha = COMMIT_SHA.substring(0, 7);
+  const logDir = `ci-logs/${shortSha}`;
+  mkdirSync(logDir, { recursive: true });
 
   // Copy test results if they exist
   if (existsSync("test-results")) {
     logger.info("Copying test-results to ci-logs/");
-    cpSync("test-results", "ci-logs/test-results", { recursive: true });
+    cpSync("test-results", `${logDir}/test-results`, { recursive: true });
   }
 
   // Copy playwright report if it exists
   if (existsSync("playwright-report")) {
     logger.info("Copying playwright-report to ci-logs/");
-    cpSync("playwright-report", "ci-logs/playwright-report", { recursive: true });
+    cpSync("playwright-report", `${logDir}/playwright-report`, { recursive: true });
   }
 
   // Create summary file
@@ -57,33 +59,8 @@ Commit: ${COMMIT_SHA}
 Ref: ${GITHUB_REF}
 Job: e2e-local
 `;
-  writeFileSync("ci-logs/summary.txt", summary);
-  logger.info("Created summary.txt");
-
-  // Configure git
-  try {
-    execSync('git config user.name "github-actions[bot]"', { stdio: "inherit" });
-    execSync('git config user.email "github-actions[bot]@users.noreply.github.com"', { stdio: "inherit" });
-
-    // Add and commit logs
-    execSync("git add -f ci-logs/", { stdio: "inherit" });
-
-    try {
-      execSync(`git commit -m "CI: Add E2E test logs for ${COMMIT_SHA}"`, { stdio: "inherit" });
-    } catch (error) {
-      logger.info("No changes to commit");
-    }
-
-    // Push to the current branch
-    try {
-      execSync(`git push origin HEAD:${GITHUB_REF}`, { stdio: "inherit" });
-      logger.success("Logs pushed successfully");
-    } catch (error) {
-      logger.warn("Failed to push logs");
-    }
-  } catch (error) {
-    logger.warn("Git operations failed");
-  }
+  writeFileSync(`${logDir}/e2e-summary.txt`, summary);
+  logger.info("Created e2e-summary.txt");
 }
 
 async function main() {
@@ -117,8 +94,9 @@ async function main() {
       testFailed = true;
     }
   } finally {
-    // Always push logs, even if tests fail
-    pushLogsToGit();
+    // Always copy test artifacts, even if tests fail
+    // The GitHub Actions workflow will push them via push-logs.sh
+    copyTestArtifacts();
   }
 
   if (testFailed) {
