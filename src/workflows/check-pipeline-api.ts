@@ -46,6 +46,25 @@ const logger = new Logger({ prefix: 'PipelineCheck' });
 let REPO_OWNER = '';
 let REPO_NAME = '';
 
+// GitHub token for authentication (optional, read from environment)
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+
+/**
+ * Get authorization headers for GitHub API requests
+ */
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'PongPush-Pipeline-Checker',
+  };
+
+  if (GITHUB_TOKEN) {
+    headers['Authorization'] = `Bearer ${GITHUB_TOKEN}`;
+  }
+
+  return headers;
+}
+
 /**
  * Parse repository owner and name from git remote URL
  */
@@ -108,10 +127,7 @@ async function fetchWorkflowRuns(sha: string): Promise<WorkflowRun[]> {
   logger.debug(`Fetching: ${url}`);
 
   const response = await fetch(url, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'PongPush-Pipeline-Checker',
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -129,10 +145,7 @@ async function fetchWorkflowJobs(runId: number): Promise<WorkflowJob[]> {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}/jobs`;
 
   const response = await fetch(url, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'PongPush-Pipeline-Checker',
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -150,10 +163,7 @@ async function fetchArtifacts(runId: number): Promise<any[]> {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}/artifacts`;
 
   const response = await fetch(url, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'PongPush-Pipeline-Checker',
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -174,15 +184,17 @@ async function downloadArtifact(artifactId: number, artifactName: string, sha: s
 
   try {
     const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'PongPush-Pipeline-Checker',
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        logger.warn(`Cannot download artifacts: Authentication required`);
+        if (!GITHUB_TOKEN) {
+          logger.warn(`Cannot download artifacts: Authentication required`);
+          logger.warn(`Set GITHUB_TOKEN environment variable to download artifacts`);
+        } else {
+          logger.warn(`Cannot download artifacts: Insufficient permissions`);
+        }
         logger.warn(`Artifacts can be downloaded manually from: https://github.com/${REPO_OWNER}/${REPO_NAME}/actions`);
         return false;
       }
@@ -219,16 +231,18 @@ async function downloadWorkflowLogs(runId: number, sha: string): Promise<string 
 
   try {
     const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'PongPush-Pipeline-Checker',
-      },
+      headers: getAuthHeaders(),
       redirect: 'follow', // GitHub redirects to the actual log URL
     });
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        logger.warn(`Cannot download logs: Authentication required`);
+        if (!GITHUB_TOKEN) {
+          logger.warn(`Cannot download logs: Authentication required`);
+          logger.warn(`Set GITHUB_TOKEN environment variable to download logs`);
+        } else {
+          logger.warn(`Cannot download logs: Insufficient permissions (requires repository read access)`);
+        }
         logger.warn(`Logs can be viewed manually at: https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}`);
         return null;
       }
@@ -451,21 +465,35 @@ async function displayFailedWorkflowDetails(run: WorkflowRun): Promise<void> {
 /**
  * Main pipeline check function
  */
-async function checkPipeline(skipWait = false, timeoutSeconds = 600): Promise<CheckResult> {
+async function checkPipeline(skipWait = false, timeoutSeconds = 600, commitSha?: string): Promise<CheckResult> {
   const startTime = Date.now();
 
   try {
     logger.section('Pipeline Status Checker (GitHub API)');
+
+    // Show authentication status
+    if (GITHUB_TOKEN) {
+      logger.info(`🔑 Using GitHub token for authentication`);
+    } else {
+      logger.warn(`⚠️  No GitHub token provided (log downloads will fail)`);
+      logger.info(`   Set GITHUB_TOKEN environment variable for full access`);
+    }
+    logger.info('');
 
     // Parse repository info from git remote
     await parseRepoInfo();
 
     // Get current context
     const branch = await getCurrentBranch();
-    const sha = await getLatestCommitSha();
+    const sha = commitSha || await getLatestCommitSha();
     const shortSha = sha.substring(0, 7);
 
     logger.info(`Branch: ${branch}`);
+    if (commitSha) {
+      logger.info(`Commit: ${shortSha} (specified via --commit)`);
+    } else {
+      logger.info(`Commit: ${shortSha} (current HEAD)`);
+    }
     logger.info('');
 
     // Wait for workflows to complete
@@ -643,6 +671,18 @@ if (timeoutIndex !== -1 && args[timeoutIndex + 1]) {
   }
 }
 
+// Parse commit argument (optional, for testing specific commits)
+let commitSha: string | undefined;
+const commitIndex = args.findIndex(arg => arg === '--commit' || arg === '-c');
+if (commitIndex !== -1 && args[commitIndex + 1]) {
+  commitSha = args[commitIndex + 1];
+  // Validate it looks like a SHA (at least 7 hex characters)
+  if (!/^[a-f0-9]{7,40}$/i.test(commitSha)) {
+    console.error('Error: Invalid commit SHA. Must be 7-40 hexadecimal characters.');
+    process.exit(1);
+  }
+}
+
 if (displayHelp) {
   console.log(`
 Pipeline Status Checker (GitHub API Version)
@@ -654,6 +694,7 @@ Options:
   -h, --help              Show this help message
   --no-wait               Don't wait for completion, just check current status
   -t, --timeout <seconds> Timeout in seconds (default: 600)
+  -c, --commit <sha>      Check specific commit instead of current HEAD (for testing)
 
 Description:
   This script checks GitHub Actions workflow status using the GitHub REST API.
@@ -695,14 +736,20 @@ Examples:
   # After pushing a commit
   git push && bun run check-pipeline-api.ts
 
-  # With authentication for artifact downloads
+  # Check a specific commit (for testing)
+  bun run check-pipeline-api.ts --commit 9b51951
+
+  # With authentication for log and artifact downloads
   GITHUB_TOKEN=ghp_xxx bun run check-pipeline-api.ts
+
+  # Test a specific failed commit with authentication
+  GITHUB_TOKEN=ghp_xxx bun run check-pipeline-api.ts --commit 9b51951 --no-wait
 `);
   process.exit(0);
 }
 
 // Run the checker
-checkPipeline(noWait, timeoutSeconds)
+checkPipeline(noWait, timeoutSeconds, commitSha)
   .then(result => {
     process.exit(result.success ? 0 : 1);
   })
