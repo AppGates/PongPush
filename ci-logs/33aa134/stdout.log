@@ -1,0 +1,100 @@
+📝 
+📝 ================================
+📝 === Auto PR Workflow Started ===
+📝 ================================
+📝 
+📝 Timestamp: 2026-01-10T05:39:19.209Z
+📝 Commit: 33aa134f7d0ee76d40541bc69abc1d1a3bb7425f
+📝 
+📝 
+📝 --- Cleaning Up Old Logs ---
+📝 Log directory: ci-logs
+📝 Current commit: 33aa134
+📝 Dry run: no
+📝 Found 2 log directory(ies)
+🔍 Deleting: 9b17b74
+🔍 Preserving: 33aa134 (current commit)
+📝 Cleanup complete: 1 deleted, 1 preserved
+📝 
+📝 
+📝 ==================================
+📝 === Cleaning Up Stale Branches ===
+📝 ==================================
+📝 
+📝 Found 7 claude branches to check
+📝 Checking 6 other branches for cleanup
+🔍 Checking if origin/claude/add-pipeline-check-rule-2qgGX has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..origin/claude/add-pipeline-check-rule-2qgGX
+🔍 Found 2 commit(s) ahead
+🔍   ✅ claude/add-pipeline-check-rule-2qgGX: has commits, keeping
+🔍 Checking if origin/claude/gitlab-api-github-action-z2DOZ has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..origin/claude/gitlab-api-github-action-z2DOZ
+🔍 Found 2 commit(s) ahead
+🔍   ✅ claude/gitlab-api-github-action-z2DOZ: has commits, keeping
+🔍 Checking if origin/claude/simplify-pr-workflow-fSFY4 has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..origin/claude/simplify-pr-workflow-fSFY4
+🔍 Found 1 commit(s) ahead
+🔍   ✅ claude/simplify-pr-workflow-fSFY4: has commits, keeping
+🔍 Checking if origin/claude/test-git-log-fix-et9yE has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..origin/claude/test-git-log-fix-et9yE
+🔍 Found 2 commit(s) ahead
+🔍   ✅ claude/test-git-log-fix-et9yE: has commits, keeping
+🔍 Checking if origin/claude/use-logger-class-fSFY4 has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..origin/claude/use-logger-class-fSFY4
+🔍 Found 1 commit(s) ahead
+🔍   ✅ claude/use-logger-class-fSFY4: has commits, keeping
+🔍 Checking if origin/claude/workflows-typescript-bun-et9yE has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..origin/claude/workflows-typescript-bun-et9yE
+🔍 Found 1 commit(s) ahead
+🔍   ✅ claude/workflows-typescript-bun-et9yE: has commits, keeping
+📝 Cleanup complete: 0 deleted, 6 kept
+📝 
+📝 
+📝 ==========================
+📝 === Branch Information ===
+📝 ==========================
+📝 
+📝 Branch: claude/fix-pipeline-zUPNQ
+📝 Ref: refs/heads/claude/fix-pipeline-zUPNQ
+📝 
+📝 
+📝 ====================================
+📝 === Checking Repository Settings ===
+📝 ====================================
+📝 
+🔍 Running: gh api repos/AppGates/PongPush --jq {allow_auto_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}
+🔍 Repository settings: {
+  "allow_auto_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true
+}
+📝 Auto-merge allowed: true
+📝 Merge commit allowed: true
+📝 Squash merge allowed: true
+📝 Rebase merge allowed: true
+📝 
+📝 
+📝 ==============================
+📝 === Checking Branch Status ===
+📝 ==============================
+📝 
+📝 Fetching from origin main (attempt 1/5)
+🔍 Running: git fetch origin main
+✅ Successfully fetched from origin
+🔍 Checking if HEAD has commits ahead of origin/main
+🔍 Running: git rev-list --count origin/main..HEAD
+🔍 Found 0 commit(s) ahead
+⚠️ Branch has no commits ahead of main
+🔍 Running: gh pr list --head claude/fix-pipeline-zUPNQ --json number --jq .[0].number
+📝 No existing PR found for branch claude/fix-pipeline-zUPNQ
+📝 No commits to create PR, deleting branch
+📝 Deleting branch claude/fix-pipeline-zUPNQ from origin
+🔍 Running: git push origin --delete claude/fix-pipeline-zUPNQ
+✅ Successfully deleted branch claude/fix-pipeline-zUPNQ from origin
+✅ Branch deleted successfully
+📝 
+📝 =========================
+📝 === Workflow Complete ===
+📝 =========================
+📝 
