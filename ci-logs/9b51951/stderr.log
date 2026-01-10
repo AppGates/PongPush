@@ -1,0 +1,24 @@
+❌ Build workflow failed: 18 | });
+19 | 
+20 | function runCommand(command: string, description: string): void {
+21 |   logger.info(`=== ${description} ===`);
+22 |   try {
+23 |     execSync(command, { stdio: "inherit" });
+         ^
+error: Command failed: npm run type-check
+ signal: null,
+ status: 2,
+ output: [ null, null, null ],
+    pid: 2196,
+ stdout: null,
+ stderr: null,
+
+      at genericNodeError (node:child_process:1000:13)
+      at checkExecSyncError (node:child_process:458:27)
+      at execSync (node:child_process:278:31)
+      at runCommand (/home/runner/work/PongPush/PongPush/src/workflows/build.ts:23:5)
+      at main (/home/runner/work/PongPush/PongPush/src/workflows/build.ts:41:3)
+      at main (/home/runner/work/PongPush/PongPush/src/workflows/build.ts:30:20)
+      at /home/runner/work/PongPush/PongPush/src/workflows/build.ts:60:1
+      at loadAndEvaluateModule (2:1)
+
