@@ -3,17 +3,17 @@
 📝 === Auto PR Workflow Started ===
 📝 ================================
 📝 
-📝 Timestamp: 2026-01-10T05:39:19.209Z
-📝 Commit: 33aa134f7d0ee76d40541bc69abc1d1a3bb7425f
+📝 Timestamp: 2026-01-10T06:01:10.643Z
+📝 Commit: 87551dc580a1416075999ee316ab9ace2431e01a
 📝 
 📝 
 📝 --- Cleaning Up Old Logs ---
 📝 Log directory: ci-logs
-📝 Current commit: 33aa134
+📝 Current commit: 87551dc
 📝 Dry run: no
 📝 Found 2 log directory(ies)
-🔍 Deleting: 9b17b74
-🔍 Preserving: 33aa134 (current commit)
+🔍 Preserving: 87551dc (current commit)
+🔍 Deleting: 33aa134
 📝 Cleanup complete: 1 deleted, 1 preserved
 📝 
 📝 
@@ -84,15 +84,97 @@
 ✅ Successfully fetched from origin
 🔍 Checking if HEAD has commits ahead of origin/main
 🔍 Running: git rev-list --count origin/main..HEAD
-🔍 Found 0 commit(s) ahead
-⚠️ Branch has no commits ahead of main
+🔍 Found 3 commit(s) ahead
+📝 Branch has commits ahead of main
+📝 
+📝 
+📝 ================================
+📝 === Checking for Existing PR ===
+📝 ================================
+📝 
 🔍 Running: gh pr list --head claude/fix-pipeline-zUPNQ --json number --jq .[0].number
 📝 No existing PR found for branch claude/fix-pipeline-zUPNQ
-📝 No commits to create PR, deleting branch
-📝 Deleting branch claude/fix-pipeline-zUPNQ from origin
-🔍 Running: git push origin --delete claude/fix-pipeline-zUPNQ
-✅ Successfully deleted branch claude/fix-pipeline-zUPNQ from origin
-✅ Branch deleted successfully
+📝 No existing PR found. Creating new PR...
+🔍 Running: git log -1 --pretty=%s
+🔍 Latest commit message: Fix: Refactor e2e-local.ts to use centralized log pushing
+📝 Commit message: Fix: Refactor e2e-local.ts to use centralized log pushing
+🔍 Running: git log origin/main..HEAD --oneline
+📝 
+📝 --- Creating PR ---
+📝 Creating PR: "Fix: Refactor e2e-local.ts to use centralized log pushing"
+🔍 Base: main, Head: claude/fix-pipeline-zUPNQ
+🔍 Running: gh pr create --title Fix: Refactor e2e-local.ts to use centralized log pushing --body ## Automated PR
+
+This PR was automatically created from a claude/** branch.
+
+### Changes
+87551dc Fix: Refactor e2e-local.ts to use centralized log pushing
+b73b793 CI: Add build logs for 33aa134f7d0ee76d40541bc69abc1d1a3bb7425f
+bc2b7d8 CI: Add auto-PR logs for 33aa134f7d0ee76d40541bc69abc1d1a3bb7425f
+
+---
+**Auto-merge**: This PR will automatically merge when all checks pass. --base main --head claude/fix-pipeline-zUPNQ
+✅ PR created: https://github.com/AppGates/PongPush/pull/23
+✅ PR created: https://github.com/AppGates/PongPush/pull/23
+📝 PR Number: 23
+📝 
+📝 ===========================
+📝 === Enabling Auto-Merge ===
+📝 ===========================
+📝 
+📝 Attempting to enable auto-merge for PR #23...
+📝 Enabling auto-merge for PR #23 with method: merge
+🔍 Running: gh pr merge 23 --auto --merge
+🔍 stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+⚠️ gh pr merge --auto failed with exit code 1
+⚠️ stderr: GraphQL: Pull request Pull request is in unstable status (enablePullRequestAutoMerge)
+⚠️ Auto-merge command failed
+📝 
+📝 =======================
+📝 === Final PR Status ===
+📝 =======================
+📝 
+🔍 Running: gh pr view 23 --json number,title,state,mergeable,mergeStateStatus,autoMergeRequest,statusCheckRollup
+🔍 PR #23 details: {
+  "autoMergeRequest": null,
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "number": 23,
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20873901629/job/59980233642",
+      "name": "create-pr",
+      "startedAt": "2026-01-10T06:01:05Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Auto Create PR"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/AppGates/PongPush/actions/runs/20873901639/job/59980233713",
+      "name": "build",
+      "startedAt": "2026-01-10T06:01:06Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "CI/CD Pipeline"
+    }
+  ],
+  "title": "Fix: Refactor e2e-local.ts to use centralized log pushing"
+}
+📝 Title: Fix: Refactor e2e-local.ts to use centralized log pushing
+📝 State: OPEN
+📝 Mergeable: MERGEABLE
+📝 Merge state: UNSTABLE
+📝 Auto-merge: disabled
+📝 
+📝 --- Status Checks ---
+📝   - create-pr: IN_PROGRESS
+📝   - build: IN_PROGRESS
+📝 
 📝 
 📝 =========================
 📝 === Workflow Complete ===
