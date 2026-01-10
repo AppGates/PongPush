@@ -59,7 +59,8 @@ function getAuthHeaders(): Record<string, string> {
   };
 
   if (GITHUB_TOKEN) {
-    headers['Authorization'] = `Bearer ${GITHUB_TOKEN}`;
+    // Use 'token' prefix for Personal Access Tokens (not 'Bearer')
+    headers['Authorization'] = `token ${GITHUB_TOKEN}`;
   }
 
   return headers;
