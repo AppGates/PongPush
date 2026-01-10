@@ -117,7 +117,7 @@ async function fetchWorkflowRuns(sha: string): Promise<WorkflowRun[]> {
     throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { workflow_runs?: WorkflowRun[] };
   return data.workflow_runs || [];
 }
 
@@ -138,7 +138,7 @@ async function fetchWorkflowJobs(runId: number): Promise<WorkflowJob[]> {
     throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { jobs?: WorkflowJob[] };
   return data.jobs || [];
 }
 
@@ -159,7 +159,7 @@ async function fetchArtifacts(runId: number): Promise<any[]> {
     throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { artifacts?: any[] };
   return data.artifacts || [];
 }
 
