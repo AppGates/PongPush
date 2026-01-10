@@ -54,6 +54,10 @@ jobs:
           path: ci-logs/
           retention-days: 7
 
+      - name: Push logs to branch (legacy system)
+        if: always() && startsWith(github.ref, 'refs/heads/claude/')
+        run: ./push-logs.sh "build logs"
+
       - name: Push logs to PongPush.Pipeline repo
         if: always() && startsWith(github.ref, 'refs/heads/claude/')
         env:
@@ -142,6 +146,10 @@ jobs:
           path: ci-logs/test-results/
           retention-days: 7
 
+      - name: Push logs to branch (legacy system)
+        if: always() && startsWith(github.ref, 'refs/heads/claude/')
+        run: ./push-logs.sh "e2e-local logs"
+
       - name: Push logs to PongPush.Pipeline repo
         if: always() && startsWith(github.ref, 'refs/heads/claude/')
         env:
@@ -222,6 +230,10 @@ jobs:
           name: auto-pr-logs-${{ github.sha }}
           path: ci-logs/
           retention-days: 7
+
+      - name: Push logs to branch (legacy system)
+        if: always()
+        run: ./push-logs.sh "auto-PR logs"
 
       - name: Push logs to PongPush.Pipeline repo
         if: always()
