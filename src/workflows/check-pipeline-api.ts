@@ -8,8 +8,9 @@
 
 import { spawnGitCommand } from './utils/process';
 import { Logger } from './utils/logger';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync, createWriteStream } from 'fs';
 import { join } from 'path';
+import { pipeline } from 'stream/promises';
 
 interface WorkflowRun {
   id: number;
@@ -208,6 +209,142 @@ async function downloadArtifact(artifactId: number, artifactName: string, sha: s
 }
 
 /**
+ * Download logs for a workflow run
+ * GitHub returns logs as a zip file containing log files for each job
+ */
+async function downloadWorkflowLogs(runId: number, sha: string): Promise<string | null> {
+  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}/logs`;
+
+  logger.info(`Downloading workflow logs...`);
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'PongPush-Pipeline-Checker',
+      },
+      redirect: 'follow', // GitHub redirects to the actual log URL
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        logger.warn(`Cannot download logs: Authentication required`);
+        logger.warn(`Logs can be viewed manually at: https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/runs/${runId}`);
+        return null;
+      }
+      throw new Error(`Failed to download logs: ${response.status} ${response.statusText}`);
+    }
+
+    // Create ci-logs directory
+    const shortSha = sha.substring(0, 7);
+    const logsDir = join('ci-logs', shortSha);
+    if (!existsSync(logsDir)) {
+      mkdirSync(logsDir, { recursive: true });
+    }
+
+    // Save logs as zip
+    const zipPath = join(logsDir, `logs-${runId}.zip`);
+    const buffer = await response.arrayBuffer();
+    writeFileSync(zipPath, Buffer.from(buffer));
+
+    logger.success(`Logs saved to: ${zipPath}`);
+
+    // Extract the zip
+    await extractLogsZip(zipPath, logsDir);
+
+    return logsDir;
+  } catch (error) {
+    logger.error(`Failed to download logs: ${error}`);
+    return null;
+  }
+}
+
+/**
+ * Extract logs zip file using Bun's built-in unzip
+ */
+async function extractLogsZip(zipPath: string, outputDir: string): Promise<void> {
+  try {
+    logger.info(`Extracting logs...`);
+
+    // Use Bun's spawn to unzip
+    const proc = Bun.spawn(['unzip', '-o', zipPath, '-d', outputDir], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+    });
+
+    await proc.exited;
+
+    logger.success(`Logs extracted to: ${outputDir}`);
+  } catch (error) {
+    logger.warn(`Could not extract logs: ${error}`);
+  }
+}
+
+/**
+ * Parse log files and find error lines
+ */
+async function parseLogsForErrors(logsDir: string): Promise<string[]> {
+  const errors: string[] = [];
+
+  try {
+    if (!existsSync(logsDir)) {
+      return errors;
+    }
+
+    const { readdirSync, readFileSync } = await import('fs');
+    const files = readdirSync(logsDir);
+
+    for (const file of files) {
+      if (!file.endsWith('.txt') && !file.endsWith('.log')) {
+        continue;
+      }
+
+      const filePath = join(logsDir, file);
+      try {
+        const content = readFileSync(filePath, 'utf-8');
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          // Look for common error patterns
+          if (
+            line.includes('Error:') ||
+            line.includes('ERROR') ||
+            line.includes('Failed') ||
+            line.includes('FAILED') ||
+            line.match(/error TS\d+:/) || // TypeScript errors
+            line.includes('❌')
+          ) {
+            // Include context: the error line and a few lines around it
+            const context: string[] = [];
+            const start = Math.max(0, i - 1);
+            const end = Math.min(lines.length, i + 2);
+
+            for (let j = start; j < end; j++) {
+              context.push(lines[j].trim());
+            }
+
+            errors.push(`${file}:\n  ${context.join('\n  ')}`);
+
+            // Limit to avoid overwhelming output
+            if (errors.length >= 10) {
+              errors.push('... (more errors in log files)');
+              return errors;
+            }
+          }
+        }
+      } catch (err) {
+        // Skip files we can't read
+      }
+    }
+  } catch (error) {
+    logger.warn(`Could not parse logs: ${error}`);
+  }
+
+  return errors;
+}
+
+/**
  * Wait for all workflow runs to complete
  */
 async function waitForWorkflows(sha: string, timeoutSeconds: number, skipWait: boolean): Promise<WorkflowRun[]> {
@@ -374,6 +511,8 @@ async function checkPipeline(skipWait = false, timeoutSeconds = 600): Promise<Ch
 
     // Failure case
     let artifactDownloaded = false;
+    const logsDirs: string[] = [];
+    const allErrors: string[] = [];
 
     if (failed.length > 0) {
       logger.error(`❌ ${failed.length} workflow(s) failed (${duration}s)`);
@@ -382,6 +521,24 @@ async function checkPipeline(skipWait = false, timeoutSeconds = 600): Promise<Ch
       // Display details for each failed workflow
       for (const run of failed) {
         await displayFailedWorkflowDetails(run);
+
+        // Download logs for failed workflow
+        const logsDir = await downloadWorkflowLogs(run.id, sha);
+        if (logsDir) {
+          logsDirs.push(logsDir);
+          logger.info('');
+
+          // Parse logs for errors
+          const errors = await parseLogsForErrors(logsDir);
+          if (errors.length > 0) {
+            logger.subsection('Key Errors Found');
+            for (const error of errors) {
+              logger.error(error);
+              logger.info('');
+            }
+            allErrors.push(...errors);
+          }
+        }
 
         // Try to download artifacts for failed workflows
         try {
@@ -402,6 +559,16 @@ async function checkPipeline(skipWait = false, timeoutSeconds = 600): Promise<Ch
         } catch (error) {
           logger.warn(`Could not fetch artifacts: ${error}`);
         }
+      }
+
+      // Display summary of where to find logs
+      if (logsDirs.length > 0) {
+        logger.section('Logs Location');
+        logger.info('Downloaded logs are available at:');
+        for (const dir of logsDirs) {
+          logger.info(`  📁 ${dir}/`);
+        }
+        logger.info('');
       }
 
       return {
@@ -495,6 +662,8 @@ Description:
   Features:
   - Fetches workflow runs directly from GitHub API
   - Polls API every 10 seconds until all workflows complete
+  - Downloads job logs for failed workflows to ci-logs/<commit-sha>/
+  - Parses logs and highlights key errors
   - Downloads artifacts for failed workflows (if authenticated)
   - Displays detailed job information for failures
 
@@ -502,13 +671,16 @@ How it works:
   1. Gets current branch and commit SHA
   2. Fetches workflow runs for the commit from GitHub API
   3. Polls every 10 seconds until all workflows complete
-  4. For failures, fetches job details and artifacts
-  5. Attempts to download artifacts to artifacts/<commit-sha>/
+  4. For failures:
+     - Downloads job logs to ci-logs/<commit-sha>/
+     - Extracts and parses logs for errors
+     - Downloads artifacts to artifacts/<commit-sha>/
+     - Shows where to find all downloaded files
 
 Authentication:
-  - Read-only operations (checking status) work without authentication
-  - Downloading artifacts requires GitHub authentication
-  - Set GITHUB_TOKEN environment variable for artifact downloads
+  - Read-only operations (checking status, downloading logs) work without authentication
+  - Downloading artifacts may require GitHub authentication
+  - Set GITHUB_TOKEN environment variable for full access
 
 Examples:
   # Check pipeline status for current commit
