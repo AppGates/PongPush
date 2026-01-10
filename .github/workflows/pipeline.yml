@@ -54,9 +54,11 @@ jobs:
           path: ci-logs/
           retention-days: 7
 
-      - name: Push logs to branch
+      - name: Push logs to PongPush.Pipeline repo
         if: always() && startsWith(github.ref, 'refs/heads/claude/')
-        run: ./push-logs.sh "build logs"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./push-logs-to-pipeline-repo.sh "build logs"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -140,9 +142,11 @@ jobs:
           path: ci-logs/test-results/
           retention-days: 7
 
-      - name: Push logs to branch
+      - name: Push logs to PongPush.Pipeline repo
         if: always() && startsWith(github.ref, 'refs/heads/claude/')
-        run: ./push-logs.sh "e2e-local logs"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./push-logs-to-pipeline-repo.sh "e2e-local logs"
 
   e2e-deployed:
     runs-on: ubuntu-latest
@@ -219,6 +223,8 @@ jobs:
           path: ci-logs/
           retention-days: 7
 
-      - name: Push logs to branch
+      - name: Push logs to PongPush.Pipeline repo
         if: always()
-        run: ./push-logs.sh "auto-PR logs"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./push-logs-to-pipeline-repo.sh "auto-PR logs"
