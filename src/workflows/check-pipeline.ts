@@ -70,16 +70,41 @@ async function pullPipelineRepo(): Promise<boolean> {
         return false;
       }
     } else {
-      // Repo exists, pull latest
-      logger.info('Pulling latest from PongPush.Pipeline repository...');
-      const pullResult = await spawnGitCommand(
-        ['pull', 'origin', 'main', '--rebase'],
+      // Check if repo is empty (no commits)
+      const hasCommitsResult = await spawnGitCommand(
+        ['rev-parse', 'HEAD'],
         logger,
         { cwd: pipelineRepoPath }
       );
-      if (!pullResult.success) {
-        logger.warn('Failed to pull PongPush.Pipeline repository');
-        return false;
+
+      if (hasCommitsResult.success) {
+        // Repo has commits, pull latest
+        logger.info('Pulling latest from PongPush.Pipeline repository...');
+        const pullResult = await spawnGitCommand(
+          ['pull', 'origin', 'main', '--rebase'],
+          logger,
+          { cwd: pipelineRepoPath }
+        );
+        if (!pullResult.success) {
+          logger.warn('Failed to pull PongPush.Pipeline repository');
+          return false;
+        }
+      } else {
+        // Repo is empty, fetch to check for new commits
+        logger.info('Pipeline repo is empty, fetching latest...');
+        const fetchResult = await spawnGitCommand(
+          ['fetch', 'origin'],
+          logger,
+          { cwd: pipelineRepoPath }
+        );
+        if (fetchResult.success) {
+          // Try to checkout main if it exists
+          await spawnGitCommand(
+            ['checkout', '-b', 'main', 'origin/main'],
+            logger,
+            { cwd: pipelineRepoPath }
+          );
+        }
       }
     }
 
