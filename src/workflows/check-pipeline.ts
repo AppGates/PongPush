@@ -73,7 +73,7 @@ async function pullPipelineRepo(): Promise<boolean> {
       // Repo exists, pull latest
       logger.info('Pulling latest from PongPush.Pipeline repository...');
       const pullResult = await spawnGitCommand(
-        ['pull', '--rebase'],
+        ['pull', 'origin', 'main', '--rebase'],
         logger,
         { cwd: pipelineRepoPath }
       );
