@@ -54,6 +54,71 @@ async function pullBranch(branch: string): Promise<boolean> {
   }
 }
 
+async function pullPipelineRepo(): Promise<boolean> {
+  const pipelineRepoPath = '/tmp/PongPush.Pipeline';
+
+  try {
+    // Check if repo exists
+    if (!existsSync(pipelineRepoPath)) {
+      logger.info('Cloning PongPush.Pipeline repository...');
+      const cloneResult = await spawnGitCommand(
+        ['clone', '--depth', '1', 'https://github.com/AppGates/PongPush.Pipeline.git', pipelineRepoPath],
+        logger
+      );
+      if (!cloneResult.success) {
+        logger.warn('Failed to clone PongPush.Pipeline repository');
+        return false;
+      }
+    } else {
+      // Check if repo is empty (no commits)
+      const hasCommitsResult = await spawnGitCommand(
+        ['rev-parse', 'HEAD'],
+        logger,
+        { cwd: pipelineRepoPath }
+      );
+
+      if (hasCommitsResult.success) {
+        // Repo has commits, pull latest
+        logger.info('Pulling latest from PongPush.Pipeline repository...');
+        const pullResult = await spawnGitCommand(
+          ['pull', 'origin', 'main', '--rebase'],
+          logger,
+          { cwd: pipelineRepoPath }
+        );
+        if (!pullResult.success) {
+          logger.warn('Failed to pull PongPush.Pipeline repository');
+          return false;
+        }
+      } else {
+        // Repo is empty, fetch to check for new commits
+        logger.info('Pipeline repo is empty, fetching latest...');
+        const fetchResult = await spawnGitCommand(
+          ['fetch', 'origin'],
+          logger,
+          { cwd: pipelineRepoPath }
+        );
+        if (fetchResult.success) {
+          // Try to checkout main if it exists
+          await spawnGitCommand(
+            ['checkout', '-b', 'main', 'origin/main'],
+            logger,
+            { cwd: pipelineRepoPath }
+          );
+        }
+      }
+    }
+
+    // Copy logs to current directory
+    const { execSync } = require('child_process');
+    execSync(`cp -r ${pipelineRepoPath}/ci-logs . 2>/dev/null || true`);
+
+    return true;
+  } catch (error) {
+    logger.warn(`Could not sync pipeline repo: ${error}`);
+    return false;
+  }
+}
+
 function getJobStatuses(sha: string): JobStatus[] {
   const shortSha = sha.substring(0, 7);
   const logDir = `ci-logs/${shortSha}`;
@@ -96,8 +161,8 @@ async function waitForAllJobs(branch: string, sha: string, timeoutSeconds = 60, 
   while (true) {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
 
-    // Pull the branch to get latest commits with logs
-    await pullBranch(branch);
+    // Pull the pipeline repository to get latest logs
+    await pullPipelineRepo();
 
     // Check status of all jobs
     const statuses = getJobStatuses(sha);
